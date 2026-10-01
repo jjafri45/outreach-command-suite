@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProposalCraft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../theme.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #111111;
+      --panel-2: #191919;
+      --panel-3: #242424;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --line: rgba(255, 255, 255, 0.1);
+      --accent: #7c3aed;
+      --accent-light: #a978f4;
+      --accent-wash: #f1ebff;
+      --accent-border: #d8c8fb;
+      --accent-mid-border: #ad8bf2;
+      --accent-heading: #6731ca;
+      --accent-soft-dark: #502b85;
+      --danger: #ef4444;
+      --success: #10b981;
+      --preview-bg: #f4f4f5;
+      --preview-shell: #ffffff;
+      --shadow: 0 22px 70px rgba(15, 23, 42, 0.16);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.25), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.18), transparent 25%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 40%;
+      min-width: 360px;
+      max-width: 640px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 18%),
+        var(--panel);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 28px;
+      position: relative;
+    }
+
+    .sidebar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent, rgba(124, 58, 237, 0.05));
+      pointer-events: none;
+    }
+
+    .sidebar-inner,
+    .preview-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-pane {
+      width: 60%;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(244, 244, 245, 0.92)),
+        var(--preview-bg);
+      padding: 28px;
+    }
+
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 26px;
+    }
+
+    .brand-block h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-block p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 30ch;
+      line-height: 1.5;
+    }
+
+    .top-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .chip label {
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .chip select,
+    .chip input[type="color"] {
+      border: none;
+      background: transparent;
+      color: var(--text);
+      outline: none;
+      min-width: 90px;
+    }
+
+    .chip input[type="color"] {
+      width: 38px;
+      height: 24px;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .toolbar button,
+    .toolbar select {
+      min-height: 44px;
+    }
+
+    .control-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    .saved-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .saved-meta {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field,
+    .toggle-row,
+    .service-card,
+    .why-item,
+    .testimonial-grid {
+      margin-bottom: 12px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #d4d4d8;
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea,
+    .saved-row select {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus,
+    .saved-row select:focus {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field input[type="file"] {
+      padding: 10px;
+    }
+
+    .button,
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 12px 26px rgba(124, 58, 237, 0.3);
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .button-danger {
+      background: rgba(239, 68, 68, 0.12);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .button-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .toggle-row small {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      transition: 0.25s ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 4px;
+      top: 4px;
+      border-radius: 50%;
+      background: white;
+      transition: 0.25s ease;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(22px);
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .service-card,
+    .why-item {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .inline-note {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .collapsible {
+      max-height: 1200px;
+      opacity: 1;
+      overflow: hidden;
+      transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s ease;
+    }
+
+    .collapsible.is-hidden {
+      max-height: 0;
+      opacity: 0;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    .preview-wrap {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .preview-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .preview-bar h2 {
+      margin: 0;
+      color: #111827;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+
+    .preview-bar p {
+      margin: 4px 0 0;
+      color: #6b7280;
+      font-size: 0.92rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.1);
+      color: var(--accent);
+      font-weight: 700;
+      border: 1px solid rgba(124, 58, 237, 0.14);
+    }
+
+    .preview-shell {
+      background: var(--preview-shell);
+      border-radius: 28px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      min-height: calc(100vh - 120px);
+      overflow: auto;
+    }
+
+    .proposal-document {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      background: #ffffff;
+      color: #111827;
+      border: 1px solid #e5e7eb;
+      border-radius: 24px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .proposal-document.classic {
+      background: #ffffff;
+      color: #111111;
+    }
+
+    .proposal-document.modern {
+      background: #ffffff;
+      color: #111827;
+      border: none;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.14);
+    }
+
+    .proposal-document.minimal {
+      background: #fffefb;
+      border-radius: 10px;
+      border: 1px solid #ece7df;
+      box-shadow: none;
+    }
+
+    .doc-header {
+      padding: 34px 34px 28px;
+      border-bottom: 1px solid #e5e7eb;
+      position: relative;
+    }
+
+    .proposal-document.modern .doc-header {
+      background: linear-gradient(135deg, #111827 0%, var(--accent-soft-dark) 100%);
+      color: #ffffff;
+      border-bottom: none;
+    }
+
+    .proposal-document.minimal .doc-header {
+      border-bottom: 1px solid var(--accent-border);
+      padding-top: 42px;
+      padding-bottom: 22px;
+    }
+
+    .doc-header-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .doc-brand {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .doc-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: #ffffff;
+    }
+
+    .logo-fallback {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      flex-shrink: 0;
+    }
+
+    .proposal-document.classic .logo-fallback,
+    .proposal-document.minimal .logo-fallback {
+      color: #ffffff;
+    }
+
+    .doc-brand h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .doc-brand p,
+    .doc-meta p,
+    .doc-meta a {
+      margin: 6px 0 0;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: inherit;
+      opacity: 0.78;
+      text-decoration: none;
+    }
+
+    .proposal-document.modern .doc-brand p,
+    .proposal-document.modern .doc-meta p,
+    .proposal-document.modern .doc-meta a {
+      opacity: 0.86;
+    }
+
+    .doc-meta {
+      min-width: 230px;
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--accent-wash);
+      border: 1px solid var(--accent-border);
+    }
+
+    .proposal-document.modern .doc-meta {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .proposal-document.minimal .doc-meta {
+      background: transparent;
+      border-radius: 0;
+      border: none;
+      border-left: 2px solid var(--accent-mid-border);
+      padding: 0 0 0 18px;
+    }
+
+    .doc-body {
+      padding: 32px 34px 36px;
+    }
+
+    .doc-section {
+      margin-bottom: 28px;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.24s ease, transform 0.24s ease;
+    }
+
+    .doc-section.hidden-section {
+      display: none;
+    }
+
+    .doc-section h3 {
+      margin: 0 0 14px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .proposal-document.modern .doc-section h3 {
+      color: var(--accent-heading);
+    }
+
+    .proposal-document.minimal .doc-section h3 {
+      font-size: 0.92rem;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      line-height: 1.72;
+      color: #374151;
+    }
+
+    .proposal-document.modern .lead {
+      color: #4b5563;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      padding: 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      background: #fafafa;
+    }
+
+    .proposal-document.modern .info-card {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+
+    .proposal-document.minimal .info-card {
+      border-radius: 0;
+      background: transparent;
+      border-left: none;
+      border-right: none;
+    }
+
+    .info-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+    }
+
+    .services-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .services-table thead th {
+      text-align: left;
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--accent-wash);
+      color: #374151;
+    }
+
+    .services-table tbody td {
+      padding: 16px;
+      vertical-align: top;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+    }
+
+    .services-table tbody td:last-child,
+    .services-table thead th:last-child {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .service-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .service-desc {
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .totals-box {
+      margin-left: auto;
+      width: min(360px, 100%);
+      border-radius: 22px;
+      border: 1px solid var(--accent-border);
+      background: linear-gradient(180deg, var(--accent-wash), #ffffff);
+      padding: 18px;
+    }
+
+    .proposal-document.minimal .totals-box {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      background: transparent;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 0;
+      color: #374151;
+    }
+
+    .total-row.final {
+      margin-top: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--accent-border);
+      color: #111827;
+      font-size: 1.12rem;
+      font-weight: 800;
+    }
+
+    .bullet-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #374151;
+      line-height: 1.8;
+    }
+
+    .quote {
+      padding: 20px 22px;
+      border-left: 4px solid var(--accent);
+      background: #fafafa;
+      border-radius: 0 18px 18px 0;
+      font-size: 1rem;
+      line-height: 1.72;
+      color: #374151;
+    }
+
+    .quote strong {
+      display: block;
+      margin-top: 12px;
+      color: #111827;
+      font-size: 0.92rem;
+    }
+
+    .terms {
+      white-space: pre-wrap;
+      color: #374151;
+      line-height: 1.8;
+    }
+
+    .doc-footer-note {
+      color: #6b7280;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px dashed #d1d5db;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    .logo-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .logo-preview img {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .small {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .pill-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill-input input[type="number"] {
+      min-width: 120px;
+    }
+
+    @media (max-width: 1180px) {
+      .app {
+        flex-direction: column;
+      }
+
+      .sidebar,
+      .preview-pane {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+      }
+
+      .preview-shell {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .sidebar,
+      .preview-pane {
+        padding: 18px;
+      }
+
+      .brand-row,
+      .preview-bar,
+      .doc-header-grid {
+        flex-direction: column;
+      }
+
+      .section-title {
+        display: block;
+      }
+
+      .section-title span {
+        display: block;
+        margin-top: 6px;
+      }
+
+      .form-grid,
+      .two-col,
+      .saved-row {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-shell,
+      .proposal-document .doc-header,
+      .proposal-document .doc-body {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .doc-brand h1 {
+        font-size: 1.7rem;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <div class="brand-row">
+          <div class="brand-block">
+            <h1>ProposalCraft</h1>
+            <p>Create polished freelance proposals fast, save your best versions, and export client-ready PDFs from one file.</p>
+          </div>
+          <div class="top-controls">
+            <div class="chip">
+              <label for="templateSelect">Template</label>
+              <select id="templateSelect">
+                <option value="classic">Classic</option>
+                <option value="modern">Modern</option>
+                <option value="minimal">Minimal</option>
+              </select>
+            </div>
+            <div class="chip">
+              <label for="accentColor">Accent</label>
+              <input id="accentColor" type="color" value="#7c3aed">
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button id="saveProposalBtn" class="button-primary">Save Proposal</button>
+          <button id="downloadPdfBtn" class="button-secondary">Download PDF</button>
+        </div>
+
+        <div class="control-card">
+          <div class="section-title">
+            <h2>Saved Proposals</h2>
+            <span>Max 10</span>
+          </div>
+          <div class="saved-row">
+            <select id="savedProposalSelect">
+              <option value="">Load a saved proposal</option>
+            </select>
+            <button id="loadProposalBtn" class="button-secondary">Load</button>
+            <button id="deleteProposalBtn" class="button-danger">Delete</button>
+          </div>
+          <div class="saved-meta" id="savedMeta">No saved proposals yet.</div>
+        </div>
+
+        <section class="control-card">
+          <div class="section-title">
+            <h2>Your Agency Info</h2>
+            <span>Saved automatically</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="agencyName">Agency Name</label>
+              <input id="agencyName" type="text">
+            </div>
+            <div class="field">
+              <label for="yourName">Your Name</label>
+              <input id="yourName" type="text">
+            </div>
+            <div class="field">
+              <label for="agencyEmail">Email</label>
+              <input id="agencyEmail" type="email">
+            </div>
+            <div class="field">
+              <label for="agencyPhone">Phone</label>
+              <input id="agencyPhone" type="text">
+            </div>
+            <div class="field full">
+              <label for="agencyWebsite">Website</label>
+              <input id="agencyWebsite" type="text">
+            </div>
+            <div class="field full">
+              <label for="agencyLogo">Logo Upload</label>
+              <input id="agencyLogo" type="file" accept="image/*">
+              <div class="logo-preview hidden" id="logoPreview">
+                <img id="logoPreviewImg" alt="Agency logo preview">
+                <div class="small">Logo saved locally in your browser.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="control-card">
+          <div class="section-title">
+            <h2>Client Info</h2>
+            <span>Proposal details</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="clientName">Client Name</label>
+              <input id="clientName" type="text">
+            </div>
+            <div class="field">
+              <label for="clientCompany">Client Company</label>
+              <input id="clientCompany" type="text">
+            </div>
+            <div class="field">
+              <label for="clientEmail">Client Email</label>
+              <input id="clientEmail" type="email">
+            </div>
+            <div class="field">
+              <label for="projectTitle">Project Title</label>
+              <input id="projectTitle" type="text">
+            </div>
+          </div>
+        </section>
+
+        <section class="control-card">
+          <div class="section-title">
+            <h2>Services</h2>
+            <span id="subtotalLabel">Subtotal: $0</span>
+          </div>
+          <div id="servicesList" class="stack"></div>
+          <button id="addServiceBtn" class="button-secondary">Add Another Service</button>
+        </section>
+
+        <section class="control-card">
+          <div class="section-title">
+            <h2>Project Details</h2>
+            <span>Commercial terms</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="currency">Currency</label>
+              <select id="currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="PKR">PKR</option>
+                <option value="AED">AED</option>
+                <option value="CAD">CAD</option>
+                <option value="AUD">AUD</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="timeline">Timeline</label>
+              <select id="timeline">
+                <option value="1 week">1 week</option>
+                <option value="2 weeks">2 weeks</option>
+                <option value="1 month">1 month</option>
+                <option value="2 months">2 months</option>
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
+            <div class="field full collapsible is-hidden" id="timelineCustomWrap">
+              <label for="timelineCustom">Custom Timeline</label>
+              <input id="timelineCustom" type="text" placeholder="e.g. 6 weeks across three phases">
+            </div>
+            <div class="field">
+              <label for="paymentTerms">Payment Terms</label>
+              <select id="paymentTerms">
+                <option value="50% upfront + 50% on delivery">50% upfront + 50% on delivery</option>
+                <option value="100% upfront">100% upfront</option>
+                <option value="33/33/33 milestone">33/33/33 milestone</option>
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
+            <div class="field full collapsible is-hidden" id="paymentCustomWrap">
+              <label for="paymentCustom">Custom Payment Terms</label>
+              <input id="paymentCustom" type="text" placeholder="e.g. 40% to start, 30% after design, 30% at launch">
+            </div>
+            <div class="field">
+              <label for="revisions">Revision Rounds Included</label>
+              <select id="revisions">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="Unlimited">Unlimited</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="validity">Validity Period</label>
+              <select id="validity">
+                <option value="7 days">7 days</option>
+                <option value="14 days">14 days</option>
+                <option value="30 days">30 days</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="startDate">Project Start Date</label>
+              <input id="startDate" type="date">
+            </div>
+            <div class="field">
+              <label for="discountType">Discount Type</label>
+              <select id="discountType">
+                <option value="none">No discount</option>
+                <option value="flat">Flat amount</option>
+                <option value="percent">Percentage</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="discountValue">Discount Value</label>
+              <input id="discountValue" type="number" min="0" step="0.01" placeholder="0">
+            </div>
+          </div>
+        </section>
+
+        <section class="control-card">
+          <div class="section-title">
+            <h2>Optional Sections</h2>
+            <span>Toggle them on or off</span>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>About Us</strong>
+              <small>Short introduction for your agency.</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="showAbout">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="aboutWrap" class="collapsible is-hidden">
+            <div class="field full">
+              <label for="aboutText">About Us Blurb</label>
+              <textarea id="aboutText"></textarea>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Why Choose Us</strong>
+              <small>Bullet points to support your value.</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="showWhy">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="whyWrap" class="collapsible is-hidden">
+            <div id="whyList" class="stack"></div>
+            <button id="addWhyBtn" class="button-secondary">Add Bullet Point</button>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Testimonial</strong>
+              <small>Add a quote from a past client.</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="showTestimonial">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="testimonialWrap" class="collapsible is-hidden">
+            <div class="form-grid testimonial-grid">
+              <div class="field">
+                <label for="testimonialName">Client Name</label>
+                <input id="testimonialName" type="text">
+              </div>
+              <div class="field full">
+                <label for="testimonialQuote">Quote</label>
+                <textarea id="testimonialQuote"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Terms &amp; Conditions</strong>
+              <small>Editable legal section with starter text.</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="showTerms">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="termsWrap" class="collapsible is-hidden">
+            <div class="field full">
+              <label for="termsText">Terms &amp; Conditions</label>
+              <textarea id="termsText"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <main class="preview-pane">
+      <div class="preview-wrap">
+        <div class="preview-bar">
+          <div>
+            <h2>Live Proposal Preview</h2>
+            <p>Everything updates in real time as you edit the form.</p>
+          </div>
+          <div class="badge" id="templateBadge">Classic Template</div>
+        </div>
+
+        <div class="preview-shell">
+          <div id="proposalPreview" class="proposal-document classic"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      appSeeded: "proposcraft_seeded_v1",
+      agency: "proposalcraft_agency_v1",
+      draft: "proposalcraft_draft_v1",
+      proposals: "proposalcraft_saved_v1"
+    };
+
+    const currencySymbols = {
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+      PKR: "₨",
+      AED: "د.إ",
+      CAD: "C$",
+      AUD: "A$"
+    };
+
+    const defaultTerms = `1. A signed approval or written confirmation is required before work begins.
+2. Payments are due according to the agreed schedule and are non-refundable once project work has started.
+3. Any work beyond the defined scope will be quoted separately and approved before execution.
+4. Delays in feedback, content, or approvals may shift delivery timelines.
+5. Final deliverables are released once outstanding balances have been cleared in full.`;
+
+    const seedState = {
+      template: "classic",
+      accentColor: "#7c3aed",
+      clientName: "Sarah Ahmed",
+      clientCompany: "Northlane Studio",
+      clientEmail: "sarah@northlanestudio.com",
+      projectTitle: "Lead Generation Website Refresh",
+      currency: "USD",
+      timeline: "1 month",
+      timelineCustom: "",
+      paymentTerms: "50% upfront + 50% on delivery",
+      paymentCustom: "",
+      revisions: "2",
+      validity: "14 days",
+      startDate: (() => {
+        const date = new Date();
+        date.setDate(date.getDate() + 7);
+        return date.toISOString().split("T")[0];
+      })(),
+      discountType: "percent",
+      discountValue: 10,
+      services: [
+        {
+          name: "Strategy & Messaging",
+          description: "Audience positioning, competitor review, lead funnel mapping, and on-page conversion copy direction.",
+          price: 900
+        },
+        {
+          name: "Design & Build",
+          description: "Custom high-converting landing page design, responsive build, and CMS-ready section layouts.",
+          price: 2200
+        },
+        {
+          name: "Analytics & Handover",
+          description: "Conversion tracking setup, QA pass, launch checklist, and recorded handoff walkthrough.",
+          price: 650
+        }
+      ],
+      optional: {
+        about: true,
+        why: true,
+        testimonial: true,
+        terms: true
+      },
+      aboutText: "ProposalCraft Studio helps freelancers and boutique agencies package strategy, design, and delivery into clear client-ready proposals that close with confidence.",
+      whyChooseUs: [
+        "Fast turnaround with a structured approval process.",
+        "Clear scope and pricing that reduce revision friction.",
+        "Conversion-focused recommendations grounded in business goals."
+      ],
+      testimonialName: "Mariam Khan, Founder at GrowthOrbit",
+      testimonialQuote: "Their proposal process was clean, persuasive, and incredibly easy for our team to approve. We moved from kickoff to signed agreement in under 48 hours.",
+      termsText: defaultTerms
+    };
+
+    const seedAgency = {
+      agencyName: "LeadFlow Creative",
+      yourName: "Jari",
+      agencyEmail: "hello@leadflowcreative.com",
+      agencyPhone: "+92 300 1234567",
+      agencyWebsite: "www.leadflowcreative.com",
+      agencyLogo: ""
+    };
+
+    let state = {};
+    let agency = {};
+
+    const fields = {
+      agencyName: document.getElementById("agencyName"),
+      yourName: document.getElementById("yourName"),
+      agencyEmail: document.getElementById("agencyEmail"),
+      agencyPhone: document.getElementById("agencyPhone"),
+      agencyWebsite: document.getElementById("agencyWebsite"),
+      agencyLogo: document.getElementById("agencyLogo"),
+      clientName: document.getElementById("clientName"),
+      clientCompany: document.getElementById("clientCompany"),
+      clientEmail: document.getElementById("clientEmail"),
+      projectTitle: document.getElementById("projectTitle"),
+      currency: document.getElementById("currency"),
+      timeline: document.getElementById("timeline"),
+      timelineCustom: document.getElementById("timelineCustom"),
+      paymentTerms: document.getElementById("paymentTerms"),
+      paymentCustom: document.getElementById("paymentCustom"),
+      revisions: document.getElementById("revisions"),
+      validity: document.getElementById("validity"),
+      startDate: document.getElementById("startDate"),
+      discountType: document.getElementById("discountType"),
+      discountValue: document.getElementById("discountValue"),
+      showAbout: document.getElementById("showAbout"),
+      showWhy: document.getElementById("showWhy"),
+      showTestimonial: document.getElementById("showTestimonial"),
+      showTerms: document.getElementById("showTerms"),
+      aboutText: document.getElementById("aboutText"),
+      testimonialName: document.getElementById("testimonialName"),
+      testimonialQuote: document.getElementById("testimonialQuote"),
+      termsText: document.getElementById("termsText"),
+      templateSelect: document.getElementById("templateSelect"),
+      accentColor: document.getElementById("accentColor")
+    };
+
+    const servicesList = document.getElementById("servicesList");
+    const whyList = document.getElementById("whyList");
+    const proposalPreview = document.getElementById("proposalPreview");
+    const subtotalLabel = document.getElementById("subtotalLabel");
+    const savedProposalSelect = document.getElementById("savedProposalSelect");
+    const savedMeta = document.getElementById("savedMeta");
+    const templateBadge = document.getElementById("templateBadge");
+    const logoPreview = document.getElementById("logoPreview");
+    const logoPreviewImg = document.getElementById("logoPreviewImg");
+
+    function deepClone(data) {
+      return JSON.parse(JSON.stringify(data));
+    }
+
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        console.warn("Failed to load", key, error);
+        return fallback;
+      }
+    }
+
+    function saveJson(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function ensureSeedData() {
+      const seeded = localStorage.getItem(STORAGE_KEYS.appSeeded);
+      if (!seeded) {
+        saveJson(STORAGE_KEYS.agency, seedAgency);
+        saveJson(STORAGE_KEYS.draft, seedState);
+        localStorage.setItem(STORAGE_KEYS.appSeeded, "true");
+      }
+    }
+
+    function initState() {
+      ensureSeedData();
+      agency = { ...seedAgency, ...loadJson(STORAGE_KEYS.agency, {}) };
+      state = { ...deepClone(seedState), ...loadJson(STORAGE_KEYS.draft, {}) };
+      state.services = Array.isArray(state.services) && state.services.length ? state.services : deepClone(seedState.services);
+      state.whyChooseUs = Array.isArray(state.whyChooseUs) ? state.whyChooseUs : deepClone(seedState.whyChooseUs);
+      state.optional = { ...seedState.optional, ...(state.optional || {}) };
+    }
+
+    function formatCurrency(value) {
+      const amount = Number(value) || 0;
+      const symbol = currencySymbols[state.currency] || "$";
+      const formatted = amount.toLocaleString(undefined, {
+        minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      });
+      return `${symbol}${formatted}`;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "TBD";
+      const date = new Date(dateString + "T00:00:00");
+      return isNaN(date.getTime())
+        ? dateString
+        : date.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    }
+
+    function currentDateText() {
+      return new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    }
+
+    function effectiveTimeline() {
+      return state.timeline === "Custom" ? (state.timelineCustom || "Custom timeline to be confirmed") : state.timeline;
+    }
+
+    function effectivePaymentTerms() {
+      return state.paymentTerms === "Custom" ? (state.paymentCustom || "Custom payment schedule to be confirmed") : state.paymentTerms;
+    }
+
+    function computeTotals() {
+      const subtotal = state.services.reduce((sum, service) => sum + (Number(service.price) || 0), 0);
+      let discount = 0;
+      if (state.discountType === "flat") {
+        discount = Number(state.discountValue) || 0;
+      } else if (state.discountType === "percent") {
+        discount = subtotal * ((Number(state.discountValue) || 0) / 100);
+      }
+      discount = Math.min(discount, subtotal);
+      const total = Math.max(subtotal - discount, 0);
+      return { subtotal, discount, total };
+    }
+
+    function getInitials(text) {
+      return (text || "PC")
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join("");
+    }
+
+    function updateAgencyField(name, value) {
+      agency[name] = value;
+      saveJson(STORAGE_KEYS.agency, agency);
+      renderPreview();
+    }
+
+    function updateStateField(name, value) {
+      state[name] = value;
+      saveJson(STORAGE_KEYS.draft, state);
+      updateConditionalViews();
+      renderPreview();
+    }
+
+    function updateOptionalField(name, value) {
+      state.optional[name] = value;
+      saveJson(STORAGE_KEYS.draft, state);
+      updateConditionalViews();
+      renderPreview();
+    }
+
+    function renderAgencyFields() {
+      fields.agencyName.value = agency.agencyName || "";
+      fields.yourName.value = agency.yourName || "";
+      fields.agencyEmail.value = agency.agencyEmail || "";
+      fields.agencyPhone.value = agency.agencyPhone || "";
+      fields.agencyWebsite.value = agency.agencyWebsite || "";
+      renderLogoPreview();
+    }
+
+    function renderStateFields() {
+      fields.clientName.value = state.clientName || "";
+      fields.clientCompany.value = state.clientCompany || "";
+      fields.clientEmail.value = state.clientEmail || "";
+      fields.projectTitle.value = state.projectTitle || "";
+      fields.currency.value = state.currency || "USD";
+      fields.timeline.value = state.timeline || "1 week";
+      fields.timelineCustom.value = state.timelineCustom || "";
+      fields.paymentTerms.value = state.paymentTerms || "50% upfront + 50% on delivery";
+      fields.paymentCustom.value = state.paymentCustom || "";
+      fields.revisions.value = state.revisions || "2";
+      fields.validity.value = state.validity || "14 days";
+      fields.startDate.value = state.startDate || "";
+      fields.discountType.value = state.discountType || "none";
+      fields.discountValue.value = state.discountValue ?? "";
+      fields.showAbout.checked = !!state.optional.about;
+      fields.showWhy.checked = !!state.optional.why;
+      fields.showTestimonial.checked = !!state.optional.testimonial;
+      fields.showTerms.checked = !!state.optional.terms;
+      fields.aboutText.value = state.aboutText || "";
+      fields.testimonialName.value = state.testimonialName || "";
+      fields.testimonialQuote.value = state.testimonialQuote || "";
+      fields.termsText.value = state.termsText || defaultTerms;
+      fields.templateSelect.value = state.template || "classic";
+      fields.accentColor.value = state.accentColor || "#7c3aed";
+      renderServices();
+      renderWhyItems();
+      applyAccent();
+      updateConditionalViews();
+    }
+
+    function renderLogoPreview() {
+      if (agency.agencyLogo) {
+        logoPreviewImg.src = agency.agencyLogo;
+        logoPreview.classList.remove("hidden");
+      } else {
+        logoPreview.classList.add("hidden");
+      }
+    }
+
+    function renderServices() {
+      servicesList.innerHTML = "";
+      state.services.forEach((service, index) => {
+        const card = document.createElement("div");
+        card.className = "service-card";
+        card.innerHTML = `
+          <div class="form-grid">
+            <div class="field">
+              <label>Service Name</label>
+              <input type="text" data-service-field="name" data-index="${index}" value="${escapeHtml(service.name || "")}">
+            </div>
+            <div class="field">
+              <label>Price</label>
+              <input type="number" min="0" step="0.01" data-service-field="price" data-index="${index}" value="${escapeAttribute(service.price ?? "")}">
+            </div>
+            <div class="field full">
+              <label>Description</label>
+              <textarea data-service-field="description" data-index="${index}">${escapeHtml(service.description || "")}</textarea>
+            </div>
+          </div>
+          <div class="inline-actions">
+            <button class="button-ghost" type="button" data-remove-service="${index}">Remove Service</button>
+          </div>
+        `;
+        servicesList.appendChild(card);
+      });
+
+      if (!state.services.length) {
+        servicesList.innerHTML = '<div class="empty-state">No services added yet. Add one to start pricing your proposal.</div>';
+      }
+    }
+
+    function renderWhyItems() {
+      whyList.innerHTML = "";
+      state.whyChooseUs.forEach((item, index) => {
+        const wrap = document.createElement("div");
+        wrap.className = "why-item";
+        wrap.innerHTML = `
+          <div class="field full">
+            <label>Bullet Point ${index + 1}</label>
+            <input type="text" data-why-index="${index}" value="${escapeHtml(item || "")}">
+          </div>
+          <button class="button-ghost" type="button" data-remove-why="${index}">Remove Point</button>
+        `;
+        whyList.appendChild(wrap);
+      });
+
+      if (!state.whyChooseUs.length) {
+        whyList.innerHTML = '<div class="empty-state">No points added yet. Add a few reasons that help the client say yes.</div>';
+      }
+    }
+
+    function updateConditionalViews() {
+      toggleWrap("timelineCustomWrap", state.timeline === "Custom");
+      toggleWrap("paymentCustomWrap", state.paymentTerms === "Custom");
+      toggleWrap("aboutWrap", !!state.optional.about);
+      toggleWrap("whyWrap", !!state.optional.why);
+      toggleWrap("testimonialWrap", !!state.optional.testimonial);
+      toggleWrap("termsWrap", !!state.optional.terms);
+    }
+
+    function toggleWrap(id, show) {
+      const el = document.getElementById(id);
+      el.classList.toggle("is-hidden", !show);
+    }
+
+    function hexToRgb(hex) {
+      const clean = String(hex || "#7c3aed").replace("#", "");
+      const value = clean.length === 3
+        ? clean.split("").map(char => char + char).join("")
+        : clean.padEnd(6, "0").slice(0, 6);
+      const number = parseInt(value, 16);
+      return {
+        r: (number >> 16) & 255,
+        g: (number >> 8) & 255,
+        b: number & 255
+      };
+    }
+
+    function rgbToHex({ r, g, b }) {
+      return `#${[r, g, b].map(channel => Math.round(channel).toString(16).padStart(2, "0")).join("")}`;
+    }
+
+    function mixHex(hexA, hexB, amountA) {
+      const a = hexToRgb(hexA);
+      const b = hexToRgb(hexB);
+      const amountB = 1 - amountA;
+      return rgbToHex({
+        r: a.r * amountA + b.r * amountB,
+        g: a.g * amountA + b.g * amountB,
+        b: a.b * amountA + b.b * amountB
+      });
+    }
+
+    function applyAccent() {
+      const accent = state.accentColor || "#7c3aed";
+      document.documentElement.style.setProperty("--accent", accent);
+      document.documentElement.style.setProperty("--accent-light", mixHex(accent, "#ffffff", 0.7));
+      document.documentElement.style.setProperty("--accent-wash", mixHex(accent, "#ffffff", 0.1));
+      document.documentElement.style.setProperty("--accent-border", mixHex(accent, "#e5e7eb", 0.18));
+      document.documentElement.style.setProperty("--accent-mid-border", mixHex(accent, "#d1d5db", 0.45));
+      document.documentElement.style.setProperty("--accent-heading", mixHex(accent, "#111827", 0.8));
+      document.documentElement.style.setProperty("--accent-soft-dark", mixHex(accent, "#111827", 0.55));
+      const label = fields.templateSelect.value;
+      templateBadge.textContent = `${label.charAt(0).toUpperCase()}${label.slice(1)} Template`;
+    }
+
+    function renderPreview() {
+      applyAccent();
+      const { subtotal, discount, total } = computeTotals();
+      subtotalLabel.textContent = `Subtotal: ${formatCurrency(subtotal)}`;
+      const logoMarkup = agency.agencyLogo
+        ? `<img class="doc-logo" src="${agency.agencyLogo}" alt="Agency logo">`
+        : `<div class="logo-fallback">${escapeHtml(getInitials(agency.agencyName || agency.yourName || "ProposalCraft"))}</div>`;
+
+      const servicesMarkup = state.services.map(service => `
+        <tr>
+          <td>
+            <div class="service-title">${escapeHtml(service.name || "Untitled Service")}</div>
+            <div class="service-desc">${escapeHtml(service.description || "Service description will appear here.")}</div>
+          </td>
+          <td>${formatCurrency(service.price)}</td>
+        </tr>
+      `).join("");
+
+      const discountLabel = state.discountType === "percent"
+        ? `Discount (${Number(state.discountValue) || 0}%)`
+        : "Discount";
+
+      proposalPreview.className = `proposal-document ${state.template}`;
+      proposalPreview.innerHTML = `
+        <div class="doc-header">
+          <div class="doc-header-grid">
+            <div class="doc-brand">
+              ${logoMarkup}
+              <div>
+                <p style="margin: 0 0 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: ${state.template === "modern" ? "rgba(255,255,255,0.72)" : state.accentColor || "#7c3aed"};">Proposal</p>
+                <h1>${escapeHtml(state.projectTitle || "Untitled Proposal")}</h1>
+                <p>Prepared by ${escapeHtml(agency.agencyName || agency.yourName || "Your Agency")}</p>
+                <p>${escapeHtml(agency.agencyWebsite || "")}</p>
+              </div>
+            </div>
+            <div class="doc-meta">
+              <p><strong>Date:</strong> ${currentDateText()}</p>
+              <p><strong>Client:</strong> ${escapeHtml(state.clientName || "Client Name")}</p>
+              <p><strong>Company:</strong> ${escapeHtml(state.clientCompany || "Client Company")}</p>
+              <p><strong>Email:</strong> ${escapeHtml(state.clientEmail || "client@example.com")}</p>
+            </div>
+          </div>
+        </div>
+        <div class="doc-body">
+          <section class="doc-section">
+            <h3>Overview</h3>
+            <p class="lead">This proposal outlines the scope, pricing, and delivery plan for <strong>${escapeHtml(state.projectTitle || "your project")}</strong>. The goal is to deliver a polished result that supports ${escapeHtml(state.clientCompany || "your business")} with clarity, speed, and measurable outcomes.</p>
+          </section>
+
+          <section class="doc-section">
+            <div class="two-col">
+              <div class="info-card">
+                <strong>Project Timeline</strong>
+                <div>${escapeHtml(effectiveTimeline())}</div>
+                <div class="doc-footer-note">Suggested start date: ${escapeHtml(formatDate(state.startDate))}</div>
+              </div>
+              <div class="info-card">
+                <strong>Payment Terms</strong>
+                <div>${escapeHtml(effectivePaymentTerms())}</div>
+                <div class="doc-footer-note">${escapeHtml(state.revisions)} revision round${state.revisions === "1" ? "" : "s"} included • Proposal valid for ${escapeHtml(state.validity)}</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="doc-section">
+            <h3>Scope & Pricing</h3>
+            <table class="services-table">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${servicesMarkup}
+              </tbody>
+            </table>
+          </section>
+
+          <section class="doc-section">
+            <div class="totals-box">
+              <div class="total-row">
+                <span>Subtotal</span>
+                <strong>${formatCurrency(subtotal)}</strong>
+              </div>
+              ${state.discountType !== "none" && discount > 0 ? `
+                <div class="total-row">
+                  <span>${escapeHtml(discountLabel)}</span>
+                  <strong>- ${formatCurrency(discount)}</strong>
+                </div>
+              ` : ""}
+              <div class="total-row final">
+                <span>Total Investment</span>
+                <span>${formatCurrency(total)}</span>
+              </div>
+            </div>
+          </section>
+
+          ${state.optional.about ? `
+            <section class="doc-section">
+              <h3>About Us</h3>
+              <p class="lead">${escapeHtml(state.aboutText || "")}</p>
+            </section>
+          ` : ""}
+
+          ${state.optional.why ? `
+            <section class="doc-section">
+              <h3>Why Choose Us</h3>
+              <ul class="bullet-list">
+                ${(state.whyChooseUs.length ? state.whyChooseUs : ["Experienced delivery with transparent communication."]).map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+              </ul>
+            </section>
+          ` : ""}
+
+          ${state.optional.testimonial ? `
+            <section class="doc-section">
+              <h3>Client Testimonial</h3>
+              <div class="quote">
+                “${escapeHtml(state.testimonialQuote || "Add a testimonial to strengthen social proof.")}”
+                <strong>${escapeHtml(state.testimonialName || "Satisfied Client")}</strong>
+              </div>
+            </section>
+          ` : ""}
+
+          ${state.optional.terms ? `
+            <section class="doc-section">
+              <h3>Terms &amp; Conditions</h3>
+              <div class="terms">${escapeHtml(state.termsText || defaultTerms)}</div>
+            </section>
+          ` : ""}
+
+          <section class="doc-section">
+            <h3>Next Step</h3>
+            <p class="doc-footer-note">To proceed, reply with your approval and we can confirm kickoff, final scope details, and the initial invoice schedule.</p>
+            <p class="doc-footer-note">Prepared by ${escapeHtml(agency.yourName || agency.agencyName || "Your Team")} • ${escapeHtml(agency.agencyEmail || "")} ${agency.agencyPhone ? "• " + escapeHtml(agency.agencyPhone) : ""}</p>
+          </section>
+        </div>
+      `;
+    }
+
+    function renderSavedProposals() {
+      const proposals = loadJson(STORAGE_KEYS.proposals, []);
+      savedProposalSelect.innerHTML = '<option value="">Load a saved proposal</option>';
+      proposals.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.name;
+        savedProposalSelect.appendChild(option);
+      });
+      savedMeta.textContent = proposals.length
+        ? `${proposals.length} saved proposal${proposals.length === 1 ? "" : "s"} available.`
+        : "No saved proposals yet.";
+    }
+
+    function collectSnapshot() {
+      return {
+        state: deepClone(state),
+        agency: deepClone(agency)
+      };
+    }
+
+    function saveProposal() {
+      const proposals = loadJson(STORAGE_KEYS.proposals, []);
+      const suggestedName = `${state.clientName || "Client"} - ${state.projectTitle || "Proposal"}`;
+      const name = window.prompt("Name this proposal", suggestedName);
+      if (!name) return;
+
+      let nextProposals = proposals.filter(item => item.name !== name);
+      if (nextProposals.length >= 10 && !proposals.find(item => item.name === name)) {
+        window.alert("You can save up to 10 proposals. Delete one before saving a new version.");
+        return;
+      }
+
+      nextProposals.unshift({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        name,
+        savedAt: new Date().toISOString(),
+        payload: collectSnapshot()
+      });
+      nextProposals = nextProposals.slice(0, 10);
+      saveJson(STORAGE_KEYS.proposals, nextProposals);
+      renderSavedProposals();
+      savedProposalSelect.value = nextProposals[0].id;
+    }
+
+    function loadProposal() {
+      const id = savedProposalSelect.value;
+      if (!id) return;
+      const proposals = loadJson(STORAGE_KEYS.proposals, []);
+      const selected = proposals.find(item => item.id === id);
+      if (!selected) return;
+      state = { ...deepClone(seedState), ...selected.payload.state };
+      agency = { ...seedAgency, ...selected.payload.agency };
+      state.services = Array.isArray(state.services) && state.services.length ? state.services : [];
+      state.whyChooseUs = Array.isArray(state.whyChooseUs) ? state.whyChooseUs : [];
+      state.optional = { ...seedState.optional, ...(state.optional || {}) };
+      saveJson(STORAGE_KEYS.draft, state);
+      saveJson(STORAGE_KEYS.agency, agency);
+      renderAgencyFields();
+      renderStateFields();
+      renderPreview();
+    }
+
+    function deleteProposal() {
+      const id = savedProposalSelect.value;
+      if (!id) return;
+      const proposals = loadJson(STORAGE_KEYS.proposals, []);
+      const selected = proposals.find(item => item.id === id);
+      if (!selected) return;
+      const confirmed = window.confirm(`Delete "${selected.name}"?`);
+      if (!confirmed) return;
+      saveJson(STORAGE_KEYS.proposals, proposals.filter(item => item.id !== id));
+      savedProposalSelect.value = "";
+      renderSavedProposals();
+    }
+
+    function getPdfPaginationRules(clone, canvas) {
+      const cloneRect = clone.getBoundingClientRect();
+      const scale = canvas.height / cloneRect.height;
+      const selectors = [
+        ".doc-header",
+        ".doc-section",
+        ".services-table tr",
+        ".total-row",
+        ".doc-footer-note",
+        ".quote",
+        ".terms"
+      ];
+      const points = [];
+
+      clone.querySelectorAll(selectors.join(",")).forEach(element => {
+        const rect = element.getBoundingClientRect();
+        const top = Math.floor((rect.top - cloneRect.top) * scale);
+        const bottom = Math.floor((rect.bottom - cloneRect.top) * scale);
+        points.push(top);
+        points.push(bottom + Math.round(10 * scale));
+      });
+
+      const keepTogetherRanges = [];
+      const termsSection = clone.querySelector(".terms")?.closest(".doc-section");
+      if (termsSection) {
+        const rect = termsSection.getBoundingClientRect();
+        const top = Math.floor((rect.top - cloneRect.top) * scale);
+        const bottom = Math.ceil((rect.bottom - cloneRect.top) * scale);
+        keepTogetherRanges.push({
+          top,
+          bottom,
+          height: bottom - top
+        });
+      }
+
+      return {
+        breakpoints: [...new Set(points)]
+          .filter(point => point > 80)
+          .sort((a, b) => a - b),
+        keepTogetherRanges
+      };
+    }
+
+    function getNextPdfSliceHeight(sourceY, pageCanvasHeight, paginationRules, canvas) {
+      const canvasHeight = canvas.height;
+      const maxY = Math.min(sourceY + pageCanvasHeight, canvasHeight);
+      const remainingHeight = canvasHeight - sourceY;
+      if (remainingHeight <= pageCanvasHeight) return remainingHeight;
+
+      const forcedBreak = paginationRules.keepTogetherRanges.find(range => {
+        const sectionStartsOnThisPage = range.top > sourceY + 40 && range.top < maxY - 40;
+        const sectionWouldSplit = range.bottom > maxY - 24;
+        const sectionCanFitOnFreshPage = range.height <= pageCanvasHeight - 72;
+        return sectionStartsOnThisPage && sectionWouldSplit && sectionCanFitOnFreshPage;
+      });
+
+      if (forcedBreak) {
+        return forcedBreak.top - sourceY;
+      }
+
+      const minY = sourceY + Math.floor(pageCanvasHeight * 0.55);
+      const structuralBreak = paginationRules.breakpoints
+        .filter(point => point >= minY && point <= maxY - 36)
+        .pop();
+
+      if (structuralBreak) {
+        return structuralBreak - sourceY;
+      }
+
+      const whitespaceBreak = findWhitespaceBreak(canvas, minY, maxY - 24);
+      return whitespaceBreak ? whitespaceBreak - sourceY : pageCanvasHeight;
+    }
+
+    function findWhitespaceBreak(canvas, minY, maxY) {
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      const startY = Math.max(Math.floor(minY), 0);
+      const endY = Math.min(Math.floor(maxY), canvas.height - 1);
+
+      for (let y = endY; y >= startY; y -= 2) {
+        const row = context.getImageData(0, y, canvas.width, 1).data;
+        let darkPixels = 0;
+        for (let x = 0; x < row.length; x += 16) {
+          const r = row[x];
+          const g = row[x + 1];
+          const b = row[x + 2];
+          if (r < 235 || g < 235 || b < 235) {
+            darkPixels += 1;
+          }
+        }
+        if (darkPixels < canvas.width / 220) {
+          return y;
+        }
+      }
+
+      return null;
+    }
+
+    async function downloadPdf() {
+      if (typeof window.jspdf === "undefined" || typeof html2canvas === "undefined") {
+        window.alert("PDF export libraries are unavailable. Check your internet connection and try again.");
+        return;
+      }
+
+      const button = document.getElementById("downloadPdfBtn");
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = "Preparing PDF...";
+
+      const clone = proposalPreview.cloneNode(true);
+      clone.style.width = proposalPreview.offsetWidth + "px";
+      clone.style.maxWidth = proposalPreview.offsetWidth + "px";
+      clone.style.position = "absolute";
+      clone.style.left = "-99999px";
+      clone.style.top = "0";
+      clone.style.borderRadius = "0";
+      clone.style.boxShadow = "none";
+      clone.style.margin = "0";
+
+      const footer = document.createElement("div");
+      footer.style.padding = "0 34px 26px";
+      footer.style.fontSize = "11px";
+      footer.style.color = "#6b7280";
+      footer.style.textAlign = "center";
+      footer.textContent = "ProposalCraft by Zorq Studio";
+      clone.appendChild(footer);
+
+      document.body.appendChild(clone);
+
+      try {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+        await Promise.all(
+          Array.from(clone.querySelectorAll("img")).map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => {
+              img.onload = resolve;
+              img.onerror = resolve;
+            });
+          })
+        );
+
+        const canvas = await html2canvas(clone, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: clone.scrollWidth,
+          windowHeight: clone.scrollHeight,
+          backgroundColor: "#ffffff"
+        });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "pt", "a4");
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const continuationPageMargin = 34;
+        const paginationRules = getPdfPaginationRules(clone, canvas);
+        let sourceY = 0;
+        let pageIndex = 0;
+
+        while (sourceY < canvas.height) {
+          const isFirstPage = pageIndex === 0;
+          const pageTop = isFirstPage ? 0 : continuationPageMargin;
+          const pageBottom = isFirstPage ? 0 : continuationPageMargin;
+          const usablePageHeight = pageHeight - pageTop - pageBottom;
+          const pageCanvasHeight = Math.floor(canvas.width * usablePageHeight / pageWidth);
+          const remainingCanvasHeight = canvas.height - sourceY;
+          const sliceHeight = Math.min(
+            getNextPdfSliceHeight(sourceY, pageCanvasHeight, paginationRules, canvas),
+            remainingCanvasHeight
+          );
+          const pageCanvas = document.createElement("canvas");
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sliceHeight;
+          const pageContext = pageCanvas.getContext("2d");
+          pageContext.fillStyle = "#ffffff";
+          pageContext.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          pageContext.drawImage(
+            canvas,
+            0,
+            sourceY,
+            canvas.width,
+            sliceHeight,
+            0,
+            0,
+            canvas.width,
+            sliceHeight
+          );
+
+          if (pageIndex > 0) {
+            pdf.addPage();
+          }
+
+          const imageData = pageCanvas.toDataURL("image/png");
+          const slicePdfHeight = (sliceHeight * pageWidth) / canvas.width;
+          pdf.addImage(imageData, "PNG", 0, pageTop, pageWidth, slicePdfHeight, undefined, "FAST");
+          sourceY += sliceHeight;
+          pageIndex += 1;
+        }
+
+        const safeClient = (state.clientName || "Client").replace(/[^\w\-]+/g, "_");
+        const safeDate = new Date().toISOString().split("T")[0];
+        pdf.save(`${safeClient}_Proposal_${safeDate}.pdf`);
+      } catch (error) {
+        console.error(error);
+        window.alert(`PDF export failed: ${error.message || "Please try again."}`);
+      } finally {
+        clone.remove();
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+
+    function bindStaticEvents() {
+      ["agencyName", "yourName", "agencyEmail", "agencyPhone", "agencyWebsite"].forEach(name => {
+        fields[name].addEventListener("input", event => updateAgencyField(name, event.target.value));
+      });
+
+      [
+        "clientName", "clientCompany", "clientEmail", "projectTitle", "currency",
+        "timeline", "timelineCustom", "paymentTerms", "paymentCustom", "revisions",
+        "validity", "startDate", "discountType", "discountValue", "aboutText",
+        "testimonialName", "testimonialQuote", "termsText", "templateSelect", "accentColor"
+      ].forEach(name => {
+        const eventName = name === "templateSelect" || name === "currency" || name === "timeline" || name === "paymentTerms" || name === "revisions" || name === "validity" || name === "discountType"
+          ? "change"
+          : "input";
+        fields[name].addEventListener(eventName, event => {
+          const keyMap = { templateSelect: "template" };
+          updateStateField(keyMap[name] || name, event.target.value);
+        });
+      });
+
+      fields.showAbout.addEventListener("change", event => updateOptionalField("about", event.target.checked));
+      fields.showWhy.addEventListener("change", event => updateOptionalField("why", event.target.checked));
+      fields.showTestimonial.addEventListener("change", event => updateOptionalField("testimonial", event.target.checked));
+      fields.showTerms.addEventListener("change", event => updateOptionalField("terms", event.target.checked));
+
+      fields.agencyLogo.addEventListener("change", async event => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const dataUrl = await readFileAsDataUrl(file);
+        updateAgencyField("agencyLogo", dataUrl);
+        renderLogoPreview();
+      });
+
+      document.getElementById("addServiceBtn").addEventListener("click", () => {
+        state.services.push({ name: "", description: "", price: 0 });
+        saveJson(STORAGE_KEYS.draft, state);
+        renderServices();
+        renderPreview();
+      });
+
+      document.getElementById("addWhyBtn").addEventListener("click", () => {
+        state.whyChooseUs.push("");
+        saveJson(STORAGE_KEYS.draft, state);
+        renderWhyItems();
+        renderPreview();
+      });
+
+      servicesList.addEventListener("input", event => {
+        const index = Number(event.target.dataset.index);
+        const field = event.target.dataset.serviceField;
+        if (Number.isNaN(index) || !field) return;
+        state.services[index][field] = field === "price" ? Number(event.target.value) : event.target.value;
+        saveJson(STORAGE_KEYS.draft, state);
+        renderPreview();
+      });
+
+      servicesList.addEventListener("click", event => {
+        const index = event.target.dataset.removeService;
+        if (typeof index === "undefined") return;
+        state.services.splice(Number(index), 1);
+        saveJson(STORAGE_KEYS.draft, state);
+        renderServices();
+        renderPreview();
+      });
+
+      whyList.addEventListener("input", event => {
+        const index = Number(event.target.dataset.whyIndex);
+        if (Number.isNaN(index)) return;
+        state.whyChooseUs[index] = event.target.value;
+        saveJson(STORAGE_KEYS.draft, state);
+        renderPreview();
+      });
+
+      whyList.addEventListener("click", event => {
+        const index = event.target.dataset.removeWhy;
+        if (typeof index === "undefined") return;
+        state.whyChooseUs.splice(Number(index), 1);
+        saveJson(STORAGE_KEYS.draft, state);
+        renderWhyItems();
+        renderPreview();
+      });
+
+      document.getElementById("saveProposalBtn").addEventListener("click", saveProposal);
+      document.getElementById("loadProposalBtn").addEventListener("click", loadProposal);
+      document.getElementById("deleteProposalBtn").addEventListener("click", deleteProposal);
+      document.getElementById("downloadPdfBtn").addEventListener("click", downloadPdf);
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function escapeAttribute(value) {
+      return String(value ?? "").replace(/"/g, "&quot;");
+    }
+
+    function bootstrap() {
+      initState();
+      renderAgencyFields();
+      renderStateFields();
+      renderSavedProposals();
+      renderPreview();
+      bindStaticEvents();
+    }
+
+    bootstrap();
+  </script>
+</body>
+<script>
+(()=>{const p=new URLSearchParams(location.search),crm='../index.html';if(p.get('source')!=='outreach-command')return;const set=(id,value)=>{const el=document.getElementById(id);if(el&&value){el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}};set('clientName',p.get('clientName'));set('clientCompany',p.get('company'));set('clientEmail',p.get('email'));set('projectTitle',p.get('projectTitle'));const link=document.createElement('a');link.href=crm;link.textContent='← Back to Outreach Command';link.style.cssText='position:fixed;right:20px;bottom:20px;z-index:9999;padding:10px 14px;border-radius:999px;background:#172033;color:#fff;font:600 13px system-ui;text-decoration:none;box-shadow:0 8px 24px rgba(15,23,42,.2)';document.body.appendChild(link);})();
+</script>
+</html>

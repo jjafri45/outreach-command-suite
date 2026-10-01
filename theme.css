@@ -1,0 +1,25 @@
+:root {
+  --oc-navy: #18314f;
+  --oc-blue: #2f6f9f;
+  --oc-blue-soft: #e9f1f7;
+  --oc-slate: #5d6b78;
+  --oc-line: #d9e2ea;
+  --oc-canvas: #f6f8fa;
+  --oc-surface: #ffffff;
+}
+
+body { background: var(--oc-canvas) !important; color: var(--oc-navy) !important; }
+.sidebar { background: #fff !important; border-color: var(--oc-line) !important; }
+.sidebar, .sidebar * { color: var(--oc-navy); }
+.sidebar .nav a, .sidebar .privacy-note, .sidebar .sidebar-section { color: var(--oc-slate) !important; }
+.sidebar .nav a:hover, .sidebar .nav a.active, .quick-action:hover { background: var(--oc-blue-soft) !important; color: var(--oc-blue) !important; }
+.brand-mark, .btn-primary, .primary-button, .btn.primary { background: var(--oc-blue) !important; }
+.main, .app, .preview-pane { background: var(--oc-canvas) !important; }
+.command-card, .card, .panel, .modal-box, .form-card, .preview-shell { background: var(--oc-surface) !important; border-color: var(--oc-line) !important; box-shadow: 0 8px 28px rgba(24,49,79,.06) !important; }
+input, select, textarea { background: #fff !important; color: var(--oc-navy) !important; border-color: var(--oc-line) !important; }
+button { border-color: var(--oc-line); }
+.client-workspace-card { background: #f8fbfd !important; border-color: #cbddea !important; }
+.app .sidebar, .app .editor-panel { background: #fff !important; border-color: var(--oc-line) !important; }
+.app .sidebar::after { display:none !important; }
+.app .preview-pane { background: var(--oc-canvas) !important; }
+.app .preview-shell { background:#fff !important; }

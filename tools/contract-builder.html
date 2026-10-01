@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Contract Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../theme.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --sidebar: #0f172a;
+      --sidebar-soft: #1e293b;
+      --border: rgba(148, 163, 184, 0.18);
+      --border-strong: rgba(148, 163, 184, 0.32);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --accent: #6366f1;
+      --accent-hover: #5558e8;
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 28%),
+        linear-gradient(135deg, #e2e8f0 0%, #f8fafc 55%, #eef2ff 100%);
+      color: var(--ink);
+    }
+
+    body {
+      padding: 20px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(360px, 40%) minmax(420px, 60%);
+      min-height: calc(100vh - 40px);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    .sidebar {
+      background:
+        radial-gradient(circle at top right, rgba(99, 102, 241, 0.28), transparent 28%),
+        linear-gradient(180deg, #0f172a 0%, #111c34 100%);
+      color: var(--text);
+      padding: 28px 24px 32px;
+      overflow-y: auto;
+    }
+
+    .preview-shell {
+      padding: 24px;
+      overflow-y: auto;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.96)),
+        repeating-linear-gradient(
+          180deg,
+          rgba(99, 102, 241, 0.03) 0,
+          rgba(99, 102, 241, 0.03) 1px,
+          transparent 1px,
+          transparent 32px
+        );
+    }
+
+    .brand {
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #c7d2fe;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.26);
+      border-radius: 999px;
+    }
+
+    .brand h1 {
+      margin: 14px 0 8px;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-card {
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.32);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .section-card h2 {
+      margin: 0 0 14px;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #cbd5e1;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #dbeafe;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      background: rgba(15, 23, 42, 0.76);
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 12px 13px;
+      font: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #64748b;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: rgba(99, 102, 241, 0.9);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
+      background: rgba(15, 23, 42, 0.92);
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: -2px;
+    }
+
+    .clause-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .clause-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.48);
+      padding: 14px;
+    }
+
+    .clause-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .clause-head input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      margin: 0;
+      flex: 0 0 auto;
+    }
+
+    .clause-head label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f8fafc;
+      cursor: pointer;
+    }
+
+    .clause-options {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .clause-item.active .clause-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      position: sticky;
+      bottom: 0;
+      padding-top: 10px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.96) 22%);
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 16px 30px rgba(99, 102, 241, 0.35);
+      flex: 1;
+    }
+
+    .primary-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .preview-paper {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 26px;
+      box-shadow: 0 24px 55px rgba(15, 23, 42, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      padding: 56px;
+    }
+
+    .contract-title {
+      margin: 0;
+      text-align: center;
+      font-size: 30px;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+    }
+
+    .contract-divider {
+      margin: 18px 0 28px;
+      border: none;
+      border-top: 2px solid #cbd5e1;
+    }
+
+    .lead {
+      margin: 0 0 18px;
+      line-height: 1.8;
+      color: var(--ink-soft);
+      font-size: 15px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 24px 0 32px;
+    }
+
+    .detail-card {
+      border: 1px solid #e2e8f0;
+      background: var(--surface-soft);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .detail-card h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #475569;
+    }
+
+    .detail-card p {
+      margin: 6px 0;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .detail-card strong {
+      color: #020617;
+    }
+
+    .clauses {
+      display: grid;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .clause-block h4 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .clause-block p {
+      margin: 0;
+      line-height: 1.85;
+      color: var(--ink-soft);
+      font-size: 15px;
+      white-space: pre-line;
+    }
+
+    .signature-section {
+      margin-top: 42px;
+      padding-top: 22px;
+      border-top: 1px solid #cbd5e1;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      margin-top: 26px;
+    }
+
+    .signature-box p {
+      margin: 0 0 18px;
+      font-weight: 600;
+    }
+
+    .signature-line {
+      border-bottom: 1.5px solid #334155;
+      height: 28px;
+      margin-bottom: 10px;
+    }
+
+    .signature-meta {
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .preview-note {
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #475569;
+      text-align: right;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1080px) {
+      body {
+        padding: 0;
+      }
+
+      .app {
+        min-height: 100vh;
+        border-radius: 0;
+        grid-template-columns: 1fr;
+      }
+
+      .preview-shell {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .grid.two,
+      .preview-grid,
+      .signature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-paper {
+        padding: 28px 20px;
+        border-radius: 20px;
+      }
+
+      .contract-title {
+        font-size: 24px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .primary-btn,
+      .ghost-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="eyebrow">Client Contract Builder</span>
+        <h1>Create a polished freelance agreement.</h1>
+        <p>Fill in the deal terms, select the clauses you need, and export a clean multi-page PDF contract.</p>
+      </div>
+
+      <form id="contractForm">
+        <section class="section-card">
+          <h2>Freelancer Info</h2>
+          <div class="grid two">
+            <div class="field">
+              <label for="freelancerName">Full Name</label>
+              <input id="freelancerName" name="freelancerName" type="text" placeholder="Jane Doe" />
+            </div>
+            <div class="field">
+              <label for="businessName">Business Name</label>
+              <input id="businessName" name="businessName" type="text" placeholder="Studio Name (optional)" />
+            </div>
+            <div class="field">
+              <label for="freelancerEmail">Email</label>
+              <input id="freelancerEmail" name="freelancerEmail" type="email" placeholder="jane@example.com" />
+            </div>
+            <div class="field">
+              <label for="freelancerPhone">Phone</label>
+              <input id="freelancerPhone" name="freelancerPhone" type="text" placeholder="+1 555 000 0000" />
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label for="freelancerAddress">Address</label>
+            <textarea id="freelancerAddress" name="freelancerAddress" placeholder="Street, city, state, postal code, country"></textarea>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <h2>Client Info</h2>
+          <div class="grid two">
+            <div class="field">
+              <label for="clientName">Client Full Name</label>
+              <input id="clientName" name="clientName" type="text" placeholder="Client Name" />
+            </div>
+            <div class="field">
+              <label for="clientBusinessName">Client Business Name</label>
+              <input id="clientBusinessName" name="clientBusinessName" type="text" placeholder="Client Company (optional)" />
+            </div>
+            <div class="field">
+              <label for="clientEmail">Client Email</label>
+              <input id="clientEmail" name="clientEmail" type="email" placeholder="client@example.com" />
+            </div>
+            <div class="field">
+              <label for="clientAddress">Client Address</label>
+              <textarea id="clientAddress" name="clientAddress" placeholder="Street, city, state, postal code, country"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <h2>Project Details</h2>
+          <div class="grid two">
+            <div class="field">
+              <label for="projectTitle">Project Title</label>
+              <input id="projectTitle" name="projectTitle" type="text" placeholder="Website redesign" />
+            </div>
+            <div class="field">
+              <label for="totalFee">Total Project Fee</label>
+              <input id="totalFee" name="totalFee" type="number" min="0" step="0.01" placeholder="2500" />
+            </div>
+            <div class="field">
+              <label for="startDate">Start Date</label>
+              <input id="startDate" name="startDate" type="date" />
+            </div>
+            <div class="field">
+              <label for="endDate">End Date / Deadline</label>
+              <input id="endDate" name="endDate" type="date" />
+            </div>
+            <div class="field">
+              <label for="currency">Currency</label>
+              <select id="currency" name="currency">
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+                <option value="EUR">EUR</option>
+                <option value="PKR">PKR</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="paymentTerms">Payment Terms</label>
+              <select id="paymentTerms" name="paymentTerms">
+                <option value="50% upfront, 50% on delivery">50% upfront 50% on delivery</option>
+                <option value="100% upfront">100% upfront</option>
+                <option value="Monthly retainer">Monthly retainer</option>
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
+          </div>
+          <div id="customPaymentWrap" class="field hidden" style="margin-top:14px;">
+            <label for="customPaymentTerms">Custom Payment Terms</label>
+            <input id="customPaymentTerms" name="customPaymentTerms" type="text" placeholder="Describe the payment schedule or milestones" />
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label for="projectDescription">Project Description</label>
+            <textarea id="projectDescription" name="projectDescription" placeholder="Describe the services, deliverables, and expected outcome"></textarea>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <h2>Contract Clauses</h2>
+          <div class="clause-list">
+            <div class="clause-item" data-clause="scope">
+              <div class="clause-head">
+                <input id="includeScope" type="checkbox" checked />
+                <label for="includeScope">Scope of Work</label>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="revision">
+              <div class="clause-head">
+                <input id="includeRevision" type="checkbox" />
+                <label for="includeRevision">Revision Policy</label>
+              </div>
+              <div class="clause-options">
+                <div class="field">
+                  <label for="revisionCount">Number of Free Revisions</label>
+                  <input id="revisionCount" type="number" min="0" step="1" placeholder="2" />
+                </div>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="late">
+              <div class="clause-head">
+                <input id="includeLateFee" type="checkbox" />
+                <label for="includeLateFee">Late Payment Fee</label>
+              </div>
+              <div class="clause-options">
+                <div class="field">
+                  <label for="lateFeeRate">Late Fee % Per Week</label>
+                  <input id="lateFeeRate" type="number" min="0" step="0.1" placeholder="5" />
+                </div>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="kill">
+              <div class="clause-head">
+                <input id="includeKillFee" type="checkbox" />
+                <label for="includeKillFee">Kill Fee / Project Cancellation</label>
+              </div>
+              <div class="clause-options">
+                <div class="field">
+                  <label for="killFeeRate">Cancellation Fee % Retained</label>
+                  <input id="killFeeRate" type="number" min="0" step="0.1" placeholder="30" />
+                </div>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="ip">
+              <div class="clause-head">
+                <input id="includeIP" type="checkbox" />
+                <label for="includeIP">Intellectual Property Transfer</label>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="nda">
+              <div class="clause-head">
+                <input id="includeConfidentiality" type="checkbox" />
+                <label for="includeConfidentiality">Confidentiality / NDA Clause</label>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="clientResp">
+              <div class="clause-head">
+                <input id="includeClientResponsibilities" type="checkbox" />
+                <label for="includeClientResponsibilities">Client Responsibilities Clause</label>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="dispute">
+              <div class="clause-head">
+                <input id="includeDisputeResolution" type="checkbox" />
+                <label for="includeDisputeResolution">Dispute Resolution Clause</label>
+              </div>
+            </div>
+
+            <div class="clause-item" data-clause="law">
+              <div class="clause-head">
+                <input id="includeGoverningLaw" type="checkbox" />
+                <label for="includeGoverningLaw">Governing Law</label>
+              </div>
+              <div class="clause-options">
+                <div class="field">
+                  <label for="governingLaw">Country / State</label>
+                  <input id="governingLaw" type="text" placeholder="England and Wales" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <h2>Signature Section</h2>
+          <div class="grid two">
+            <div class="field">
+              <label for="signatureFreelancerName">Freelancer Name</label>
+              <input id="signatureFreelancerName" type="text" placeholder="Freelancer name" />
+            </div>
+            <div class="field">
+              <label for="signatureClientName">Client Name</label>
+              <input id="signatureClientName" type="text" placeholder="Client name" />
+            </div>
+            <div class="field">
+              <label for="signatureFreelancerDate">Freelancer Signature Date</label>
+              <input id="signatureFreelancerDate" type="date" />
+            </div>
+            <div class="field">
+              <label for="signatureClientDate">Client Signature Date</label>
+              <input id="signatureClientDate" type="date" />
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button type="button" class="ghost-btn" id="resetBtn">Reset</button>
+          <button type="button" class="primary-btn" id="downloadPdfBtn">Download PDF</button>
+        </div>
+      </form>
+    </aside>
+
+    <main class="preview-shell">
+      <div class="preview-note">Live contract preview</div>
+      <div class="preview-paper" id="contractPreview"></div>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById("contractForm");
+    const preview = document.getElementById("contractPreview");
+    const paymentTermsSelect = document.getElementById("paymentTerms");
+    const customPaymentWrap = document.getElementById("customPaymentWrap");
+    const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const clauseToggles = [
+      { checkbox: "includeScope", card: '[data-clause="scope"]' },
+      { checkbox: "includeRevision", card: '[data-clause="revision"]' },
+      { checkbox: "includeLateFee", card: '[data-clause="late"]' },
+      { checkbox: "includeKillFee", card: '[data-clause="kill"]' },
+      { checkbox: "includeIP", card: '[data-clause="ip"]' },
+      { checkbox: "includeConfidentiality", card: '[data-clause="nda"]' },
+      { checkbox: "includeClientResponsibilities", card: '[data-clause="clientResp"]' },
+      { checkbox: "includeDisputeResolution", card: '[data-clause="dispute"]' },
+      { checkbox: "includeGoverningLaw", card: '[data-clause="law"]' }
+    ];
+
+    const currencySymbols = {
+      USD: "$",
+      GBP: "GBP ",
+      EUR: "EUR ",
+      PKR: "PKR "
+    };
+
+    const defaultText = {
+      freelancerName: "Freelancer Name",
+      clientName: "Client Name",
+      projectTitle: "Project Title",
+      projectDescription: "Project description will appear here.",
+      address: "Address not provided"
+    };
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "Not specified";
+      const date = new Date(value + "T00:00:00");
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+    }
+
+    function formatMoney(amount, currency) {
+      const number = parseFloat(amount);
+      if (Number.isNaN(number)) return "Not specified";
+      const symbol = currencySymbols[currency] || "";
+      return symbol + number.toLocaleString(undefined, {
+        minimumFractionDigits: number % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function readState() {
+      const state = {
+        freelancerName: document.getElementById("freelancerName").value.trim(),
+        businessName: document.getElementById("businessName").value.trim(),
+        freelancerEmail: document.getElementById("freelancerEmail").value.trim(),
+        freelancerPhone: document.getElementById("freelancerPhone").value.trim(),
+        freelancerAddress: document.getElementById("freelancerAddress").value.trim(),
+        clientName: document.getElementById("clientName").value.trim(),
+        clientBusinessName: document.getElementById("clientBusinessName").value.trim(),
+        clientEmail: document.getElementById("clientEmail").value.trim(),
+        clientAddress: document.getElementById("clientAddress").value.trim(),
+        projectTitle: document.getElementById("projectTitle").value.trim(),
+        projectDescription: document.getElementById("projectDescription").value.trim(),
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        totalFee: document.getElementById("totalFee").value,
+        currency: document.getElementById("currency").value,
+        paymentTerms: paymentTermsSelect.value,
+        customPaymentTerms: document.getElementById("customPaymentTerms").value.trim(),
+        revisionCount: document.getElementById("revisionCount").value.trim(),
+        lateFeeRate: document.getElementById("lateFeeRate").value.trim(),
+        killFeeRate: document.getElementById("killFeeRate").value.trim(),
+        governingLaw: document.getElementById("governingLaw").value.trim(),
+        includeScope: document.getElementById("includeScope").checked,
+        includeRevision: document.getElementById("includeRevision").checked,
+        includeLateFee: document.getElementById("includeLateFee").checked,
+        includeKillFee: document.getElementById("includeKillFee").checked,
+        includeIP: document.getElementById("includeIP").checked,
+        includeConfidentiality: document.getElementById("includeConfidentiality").checked,
+        includeClientResponsibilities: document.getElementById("includeClientResponsibilities").checked,
+        includeDisputeResolution: document.getElementById("includeDisputeResolution").checked,
+        includeGoverningLaw: document.getElementById("includeGoverningLaw").checked,
+        signatureFreelancerName: document.getElementById("signatureFreelancerName").value.trim(),
+        signatureFreelancerDate: document.getElementById("signatureFreelancerDate").value,
+        signatureClientName: document.getElementById("signatureClientName").value.trim(),
+        signatureClientDate: document.getElementById("signatureClientDate").value
+      };
+
+      if (!state.signatureFreelancerName && state.freelancerName) {
+        state.signatureFreelancerName = state.freelancerName;
+      }
+      if (!state.signatureClientName && state.clientName) {
+        state.signatureClientName = state.clientName;
+      }
+
+      return state;
+    }
+
+    function getEffectivePaymentTerms(state) {
+      return state.paymentTerms === "Custom"
+        ? (state.customPaymentTerms || "Custom payment terms to be agreed in writing.")
+        : state.paymentTerms;
+    }
+
+    function getPartyDisplay(name, business) {
+      if (business && name) return business + " (" + name + ")";
+      return business || name || "Not specified";
+    }
+
+    function buildClauses(state) {
+      const clauses = [];
+
+      if (state.includeScope) {
+        clauses.push({
+          heading: "Scope of Work",
+          body: "This agreement covers the following services: " + (state.projectDescription || "Detailed project services and deliverables will be confirmed by the parties in writing.") + " Any work outside this scope will require a separate written agreement and may incur additional fees."
+        });
+      }
+
+      if (state.includeRevision) {
+        clauses.push({
+          heading: "Revision Policy",
+          body: "The client is entitled to " + (state.revisionCount || "0") + " rounds of revisions at no additional cost. Additional revisions beyond this will be billed at the freelancer's standard hourly rate."
+        });
+      }
+
+      if (state.includeLateFee) {
+        clauses.push({
+          heading: "Late Payment Fee",
+          body: "Invoices unpaid beyond the agreed due date will incur a late fee of " + (state.lateFeeRate || "0") + "% per week until the outstanding balance is settled."
+        });
+      }
+
+      if (state.includeKillFee) {
+        clauses.push({
+          heading: "Kill Fee / Project Cancellation",
+          body: "Should the client cancel this project after work has commenced, a cancellation fee of " + (state.killFeeRate || "0") + "% of the total project fee will be retained by the freelancer to cover time and resources already invested."
+        });
+      }
+
+      if (state.includeIP) {
+        clauses.push({
+          heading: "Intellectual Property Transfer",
+          body: "All intellectual property, including but not limited to designs, code, and written content produced under this agreement, shall transfer to the client upon receipt of full payment."
+        });
+      }
+
+      if (state.includeConfidentiality) {
+        clauses.push({
+          heading: "Confidentiality",
+          body: "Both parties agree to keep all project-related information, business data, and communications confidential and not to disclose them to any third party without prior written consent."
+        });
+      }
+
+      if (state.includeClientResponsibilities) {
+        clauses.push({
+          heading: "Client Responsibilities",
+          body: "The client agrees to provide all required materials, feedback, and approvals in a timely manner. Delays caused by the client may result in a revised project timeline at no fault of the freelancer."
+        });
+      }
+
+      if (state.includeDisputeResolution) {
+        clauses.push({
+          heading: "Dispute Resolution",
+          body: "In the event of a dispute, both parties agree to first attempt resolution through good-faith negotiation before pursuing legal action."
+        });
+      }
+
+      if (state.includeGoverningLaw) {
+        clauses.push({
+          heading: "Governing Law",
+          body: "This agreement shall be governed by the laws of " + (state.governingLaw || "the applicable governing jurisdiction") + "."
+        });
+      }
+
+      return clauses;
+    }
+
+    function renderPreview() {
+      const state = readState();
+      const freelancerDisplay = getPartyDisplay(state.freelancerName, state.businessName);
+      const clientDisplay = getPartyDisplay(state.clientName, state.clientBusinessName);
+      const projectTitle = state.projectTitle || defaultText.projectTitle;
+      const paymentTerms = getEffectivePaymentTerms(state);
+      const clauses = buildClauses(state);
+
+      const clauseMarkup = clauses.length
+        ? clauses.map((clause, index) => `
+          <div class="clause-block">
+            <h4>${index + 1}. ${escapeHtml(clause.heading)}</h4>
+            <p>${escapeHtml(clause.body)}</p>
+          </div>
+        `).join("")
+        : `<div class="clause-block"><p class="placeholder">Select contract clauses from the left panel to include them in the agreement.</p></div>`;
+
+      preview.innerHTML = `
+        <h1 class="contract-title">FREELANCE SERVICE AGREEMENT</h1>
+        <hr class="contract-divider" />
+        <p class="lead">
+          This Freelance Service Agreement ("Agreement") is entered into between <strong>${escapeHtml(freelancerDisplay || defaultText.freelancerName)}</strong>
+          and <strong>${escapeHtml(clientDisplay || defaultText.clientName)}</strong> for the project titled
+          <strong>${escapeHtml(projectTitle)}</strong>. This Agreement outlines the services, payment structure, timing, and other governing terms agreed by both parties.
+        </p>
+
+        <div class="preview-grid">
+          <div class="detail-card">
+            <h3>Freelancer</h3>
+            <p><strong>Name:</strong> ${escapeHtml(state.freelancerName || defaultText.freelancerName)}</p>
+            <p><strong>Business:</strong> ${escapeHtml(state.businessName || "Not specified")}</p>
+            <p><strong>Email:</strong> ${escapeHtml(state.freelancerEmail || "Not specified")}</p>
+            <p><strong>Phone:</strong> ${escapeHtml(state.freelancerPhone || "Not specified")}</p>
+            <p><strong>Address:</strong> ${escapeHtml(state.freelancerAddress || defaultText.address)}</p>
+          </div>
+          <div class="detail-card">
+            <h3>Client</h3>
+            <p><strong>Name:</strong> ${escapeHtml(state.clientName || defaultText.clientName)}</p>
+            <p><strong>Business:</strong> ${escapeHtml(state.clientBusinessName || "Not specified")}</p>
+            <p><strong>Email:</strong> ${escapeHtml(state.clientEmail || "Not specified")}</p>
+            <p><strong>Address:</strong> ${escapeHtml(state.clientAddress || defaultText.address)}</p>
+          </div>
+          <div class="detail-card">
+            <h3>Project</h3>
+            <p><strong>Title:</strong> ${escapeHtml(projectTitle)}</p>
+            <p><strong>Start Date:</strong> ${escapeHtml(formatDate(state.startDate))}</p>
+            <p><strong>Deadline:</strong> ${escapeHtml(formatDate(state.endDate))}</p>
+            <p><strong>Description:</strong> ${escapeHtml(state.projectDescription || defaultText.projectDescription)}</p>
+          </div>
+          <div class="detail-card">
+            <h3>Commercial Terms</h3>
+            <p><strong>Total Fee:</strong> ${escapeHtml(formatMoney(state.totalFee, state.currency))}</p>
+            <p><strong>Currency:</strong> ${escapeHtml(state.currency)}</p>
+            <p><strong>Payment Terms:</strong> ${escapeHtml(paymentTerms)}</p>
+          </div>
+        </div>
+
+        <div class="clauses">${clauseMarkup}</div>
+
+        <div class="signature-section">
+          <div class="clause-block">
+            <h4>Signatures</h4>
+            <p>By signing below, both parties acknowledge that they have read, understood, and agreed to the terms of this Agreement.</p>
+          </div>
+          <div class="signature-grid">
+            <div class="signature-box">
+              <p>Freelancer</p>
+              <div class="signature-line"></div>
+              <div class="signature-meta">
+                <span><strong>Name:</strong> ${escapeHtml(state.signatureFreelancerName || state.freelancerName || defaultText.freelancerName)}</span>
+                <span><strong>Date:</strong> ${escapeHtml(formatDate(state.signatureFreelancerDate))}</span>
+              </div>
+            </div>
+            <div class="signature-box">
+              <p>Client</p>
+              <div class="signature-line"></div>
+              <div class="signature-meta">
+                <span><strong>Name:</strong> ${escapeHtml(state.signatureClientName || state.clientName || defaultText.clientName)}</span>
+                <span><strong>Date:</strong> ${escapeHtml(formatDate(state.signatureClientDate))}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function syncSignatureNames() {
+      const freelancerName = document.getElementById("freelancerName").value.trim();
+      const clientName = document.getElementById("clientName").value.trim();
+      const freelancerSignatureInput = document.getElementById("signatureFreelancerName");
+      const clientSignatureInput = document.getElementById("signatureClientName");
+
+      if (!freelancerSignatureInput.dataset.touched || freelancerSignatureInput.value.trim() === "") {
+        freelancerSignatureInput.value = freelancerName;
+      }
+      if (!clientSignatureInput.dataset.touched || clientSignatureInput.value.trim() === "") {
+        clientSignatureInput.value = clientName;
+      }
+    }
+
+    function updateClauseCards() {
+      clauseToggles.forEach(({ checkbox, card }) => {
+        const checked = document.getElementById(checkbox).checked;
+        const clauseCard = document.querySelector(card);
+        clauseCard.classList.toggle("active", checked);
+      });
+    }
+
+    function updatePaymentTermsVisibility() {
+      const isCustom = paymentTermsSelect.value === "Custom";
+      customPaymentWrap.classList.toggle("hidden", !isCustom);
+    }
+
+    function handleInput(event) {
+      const target = event.target;
+      if (target.id === "freelancerName" || target.id === "clientName") {
+        syncSignatureNames();
+      }
+      if (target.id === "signatureFreelancerName" || target.id === "signatureClientName") {
+        target.dataset.touched = "true";
+      }
+      if (target.id === "paymentTerms") {
+        updatePaymentTermsVisibility();
+      }
+
+      updateClauseCards();
+      renderPreview();
+    }
+
+    function sanitizeFilenamePart(value, fallback) {
+      const clean = (value || fallback || "Document")
+        .replace(/[\\/:*?"<>|]+/g, "")
+        .replace(/\s+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      return clean || fallback || "Document";
+    }
+
+    function exportPdf() {
+      const state = readState();
+      const clauses = buildClauses(state);
+      const paymentTerms = getEffectivePaymentTerms(state);
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        unit: "pt",
+        format: "a4"
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 54;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
+
+      const ensureSpace = (needed = 22) => {
+        if (y + needed > pageHeight - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+      };
+
+      const addWrappedText = (text, options = {}) => {
+        const fontSize = options.fontSize || 11;
+        const lineHeight = options.lineHeight || fontSize * 1.5;
+        const indent = options.indent || 0;
+        const style = options.style || "normal";
+        const x = margin + indent;
+        const width = contentWidth - indent;
+        const lines = pdf.splitTextToSize(text, width);
+        pdf.setFont("helvetica", style);
+        pdf.setFontSize(fontSize);
+        lines.forEach((line) => {
+          ensureSpace(lineHeight);
+          pdf.text(line, x, y);
+          y += lineHeight;
+        });
+      };
+
+      const addDivider = () => {
+        ensureSpace(16);
+        pdf.setDrawColor(148, 163, 184);
+        pdf.setLineWidth(1);
+        pdf.line(margin, y, pageWidth - margin, y);
+        y += 18;
+      };
+
+      pdf.setTextColor(15, 23, 42);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(18);
+      pdf.text("FREELANCE SERVICE AGREEMENT", pageWidth / 2, y, { align: "center" });
+      y += 18;
+      addDivider();
+
+      addWrappedText(
+        "This Freelance Service Agreement (\"Agreement\") is entered into between " +
+        getPartyDisplay(state.freelancerName || defaultText.freelancerName, state.businessName) +
+        " and " +
+        getPartyDisplay(state.clientName || defaultText.clientName, state.clientBusinessName) +
+        " for the project titled \"" + (state.projectTitle || defaultText.projectTitle) + "\". This Agreement outlines the services, payment structure, timing, and other governing terms agreed by both parties.",
+        { fontSize: 11, lineHeight: 18 }
+      );
+      y += 6;
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      ensureSpace(20);
+      pdf.text("PARTY DETAILS", margin, y);
+      y += 18;
+
+      addWrappedText("Freelancer: " + (state.freelancerName || defaultText.freelancerName), { style: "bold" });
+      addWrappedText("Business Name: " + (state.businessName || "Not specified"));
+      addWrappedText("Email: " + (state.freelancerEmail || "Not specified"));
+      addWrappedText("Phone: " + (state.freelancerPhone || "Not specified"));
+      addWrappedText("Address: " + (state.freelancerAddress || defaultText.address));
+      y += 4;
+      addWrappedText("Client: " + (state.clientName || defaultText.clientName), { style: "bold" });
+      addWrappedText("Business Name: " + (state.clientBusinessName || "Not specified"));
+      addWrappedText("Email: " + (state.clientEmail || "Not specified"));
+      addWrappedText("Address: " + (state.clientAddress || defaultText.address));
+      y += 6;
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      ensureSpace(20);
+      pdf.text("PROJECT DETAILS", margin, y);
+      y += 18;
+
+      addWrappedText("Project Title: " + (state.projectTitle || defaultText.projectTitle), { style: "bold" });
+      addWrappedText("Project Description: " + (state.projectDescription || defaultText.projectDescription));
+      addWrappedText("Start Date: " + formatDate(state.startDate));
+      addWrappedText("End Date / Deadline: " + formatDate(state.endDate));
+      addWrappedText("Total Project Fee: " + formatMoney(state.totalFee, state.currency));
+      addWrappedText("Currency: " + (state.currency || "Not specified"));
+      addWrappedText("Payment Terms: " + paymentTerms);
+      y += 8;
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      ensureSpace(20);
+      pdf.text("CONTRACT CLAUSES", margin, y);
+      y += 18;
+
+      if (!clauses.length) {
+        addWrappedText("No optional clauses were selected for this agreement.");
+      } else {
+        clauses.forEach((clause, index) => {
+          addWrappedText((index + 1) + ". " + clause.heading, {
+            style: "bold",
+            fontSize: 11,
+            lineHeight: 17
+          });
+          addWrappedText(clause.body, {
+            fontSize: 11,
+            lineHeight: 18
+          });
+          y += 8;
+        });
+      }
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      ensureSpace(24);
+      pdf.text("SIGNATURES", margin, y);
+      y += 18;
+
+      addWrappedText("By signing below, both parties acknowledge that they have read, understood, and agreed to the terms of this Agreement.", {
+        fontSize: 11,
+        lineHeight: 18
+      });
+      y += 18;
+
+      ensureSpace(110);
+      const midX = pageWidth / 2 + 10;
+      const lineWidth = contentWidth / 2 - 18;
+      const lineY = y + 34;
+
+      pdf.setLineWidth(1);
+      pdf.line(margin, lineY, margin + lineWidth, lineY);
+      pdf.line(midX, lineY, midX + lineWidth, lineY);
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.text("Freelancer", margin, y);
+      pdf.text("Client", midX, y);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.text("Name: " + (state.signatureFreelancerName || state.freelancerName || defaultText.freelancerName), margin, lineY + 18);
+      pdf.text("Date: " + formatDate(state.signatureFreelancerDate), margin, lineY + 36);
+      pdf.text("Name: " + (state.signatureClientName || state.clientName || defaultText.clientName), midX, lineY + 18);
+      pdf.text("Date: " + formatDate(state.signatureClientDate), midX, lineY + 36);
+
+      const filename = "Contract_" +
+        sanitizeFilenamePart(state.clientName, "Client") +
+        "_" +
+        sanitizeFilenamePart(state.projectTitle, "Project") +
+        ".pdf";
+
+      pdf.save(filename);
+    }
+
+    form.addEventListener("input", handleInput);
+    form.addEventListener("change", handleInput);
+
+    resetBtn.addEventListener("click", () => {
+      form.reset();
+      document.getElementById("signatureFreelancerName").dataset.touched = "";
+      document.getElementById("signatureClientName").dataset.touched = "";
+      updatePaymentTermsVisibility();
+      syncSignatureNames();
+      updateClauseCards();
+      renderPreview();
+    });
+
+    downloadPdfBtn.addEventListener("click", exportPdf);
+
+    updatePaymentTermsVisibility();
+    syncSignatureNames();
+    updateClauseCards();
+    renderPreview();
+  </script>
+</body>
+<script>
+(()=>{const p=new URLSearchParams(location.search),crm='../index.html';if(p.get('source')!=='outreach-command')return;const set=(id,value)=>{const el=document.getElementById(id);if(el&&value){el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}};set('clientName',p.get('clientName'));set('clientBusinessName',p.get('company'));set('clientEmail',p.get('email'));set('projectTitle',p.get('projectTitle'));set('totalFee',p.get('value'));set('signatureClientName',p.get('clientName'));const link=document.createElement('a');link.href=crm;link.textContent='← Back to Outreach Command';link.style.cssText='position:fixed;right:20px;bottom:20px;z-index:9999;padding:10px 14px;border-radius:999px;background:#172033;color:#fff;font:600 13px system-ui;text-decoration:none;box-shadow:0 8px 24px rgba(15,23,42,.2)';document.body.appendChild(link);})();
+</script>
+</html>
