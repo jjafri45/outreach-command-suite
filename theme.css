@@ -1,25 +1,32 @@
 :root {
-  --oc-navy: #18314f;
-  --oc-blue: #2f6f9f;
-  --oc-blue-soft: #e9f1f7;
-  --oc-slate: #5d6b78;
-  --oc-line: #d9e2ea;
-  --oc-canvas: #f6f8fa;
-  --oc-surface: #ffffff;
+  --bg: #08111f; --bg-raised: #0d1929; --bg-sunken: #07101c;
+  --surface: #111f31; --surface-2: #17283d; --border: #233851; --border-2: #314966;
+  --ink: #f4f8fc; --ink-2: #b5c3d3; --ink-3: #7f91a5; --muted: #9badbf;
+  --green: #46b8a6; --green-dim: #319989; --green-bg: rgba(70,184,166,.14);
+  --blue: #5da8e7; --blue-bg: rgba(93,168,231,.14); --amber: #e8b766; --red: #e77575;
+  --sidebar: #07101c; --panel: #111f31; --panel-soft: #17283d; --panel-dark: #07101c;
+  --canvas: #08111f; --canvas-2: #0d1929; --rule: #233851; --ink-soft: #b5c3d3;
+  --teal: #46b8a6; --teal-deep: #319989; --accent: #46b8a6; --accent-deep: #319989;
+  --coral: #46b8a6; --coral-deep: #319989; --blue-btn: #5da8e7;
+  --shadow: 0 12px 32px rgba(0,0,0,.22); --shadow-lg: 0 18px 48px rgba(0,0,0,.32);
 }
 
-body { background: var(--oc-canvas) !important; color: var(--oc-navy) !important; }
-.sidebar { background: #fff !important; border-color: var(--oc-line) !important; }
-.sidebar, .sidebar * { color: var(--oc-navy); }
-.sidebar .nav a, .sidebar .privacy-note, .sidebar .sidebar-section { color: var(--oc-slate) !important; }
-.sidebar .nav a:hover, .sidebar .nav a.active, .quick-action:hover { background: var(--oc-blue-soft) !important; color: var(--oc-blue) !important; }
-.brand-mark, .btn-primary, .primary-button, .btn.primary { background: var(--oc-blue) !important; }
-.main, .app, .preview-pane { background: var(--oc-canvas) !important; }
-.command-card, .card, .panel, .modal-box, .form-card, .preview-shell { background: var(--oc-surface) !important; border-color: var(--oc-line) !important; box-shadow: 0 8px 28px rgba(24,49,79,.06) !important; }
-input, select, textarea { background: #fff !important; color: var(--oc-navy) !important; border-color: var(--oc-line) !important; }
-button { border-color: var(--oc-line); }
-.client-workspace-card { background: #f8fbfd !important; border-color: #cbddea !important; }
-.app .sidebar, .app .editor-panel { background: #fff !important; border-color: var(--oc-line) !important; }
+body { background: #08111f !important; color: #f4f8fc !important; }
+.sidebar { background: #07101c !important; border-color: #233851 !important; }
+.sidebar .nav a, .privacy-note, .sidebar-section { color: #9badbf !important; }
+.sidebar .nav a:hover, .sidebar .nav a.active, .quick-action:hover { background: #14283a !important; color: #f4f8fc !important; }
+.brand-mark, .btn-primary, .primary-button, .btn.primary { background: #319989 !important; color:#fff !important; }
+.main, .app, .preview-pane { background: #08111f !important; }
+.command-card, .card, .panel, .modal-box, .form-card { background: #111f31 !important; border-color: #233851 !important; box-shadow: 0 12px 32px rgba(0,0,0,.18) !important; }
+input, select, textarea { background: #0b1726 !important; color: #f4f8fc !important; border-color: #314966 !important; }
+input::placeholder, textarea::placeholder { color: #7f91a5 !important; }
+button { border-color: #314966; }
+.client-workspace-card { background: #111f31 !important; border-color: #46b8a6 !important; }
+.top-workspace-button { border:1px solid #46b8a6; background:#102b35; color:#d9fff7; border-radius:8px; padding:8px 12px; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap; }
+.top-workspace-button:hover { background:#174151; color:#fff; }
+
+/* The document previews stay white intentionally; the editor chrome matches Outreach Command. */
+.app .sidebar, .app .editor-panel { background: #0d1929 !important; border-color: #233851 !important; }
 .app .sidebar::after { display:none !important; }
-.app .preview-pane { background: var(--oc-canvas) !important; }
+.app .preview-pane { background: #08111f !important; }
 .app .preview-shell { background:#fff !important; }

@@ -8173,6 +8173,7 @@ Return JSON only:
     hub.querySelectorAll('[data-hub-tool]').forEach(btn=>btn.addEventListener('click',()=>{const row=data.find(item=>String(item.id)===hub.querySelector('#workspaceProspect').value);if(row)openWorkspace(tools.find(tool=>tool.key===btn.dataset.hubTool),row);}));
   }
   function renderClientWorkspace(row){
+    return;
     const pane=document.getElementById('pane-info');
     if(!pane||!row) return;
     document.getElementById('clientWorkspaceCard')?.remove();
@@ -8186,12 +8187,12 @@ Return JSON only:
   if(typeof priorRenderDetailInfo==='function'){
     window.renderDetailInfo=function(row){priorRenderDetailInfo.apply(this,arguments);renderClientWorkspace(row);};
   }
-  const quickActions=document.querySelector('.quick-actions');
-  if(quickActions&&!document.getElementById('quickClientWorkspace')){
+  const commandTools=document.querySelector('.command-tools');
+  if(commandTools&&!document.getElementById('quickClientWorkspace')){
     const button=document.createElement('button');
-    button.id='quickClientWorkspace';button.className='quick-action';button.type='button';button.innerHTML='<span>✦</span>Client Workspace';
+    button.id='quickClientWorkspace';button.className='top-workspace-button';button.type='button';button.innerHTML='✦ Client Workspace';
     button.addEventListener('click',openWorkspaceHub);
-    quickActions.appendChild(button);
+    commandTools.appendChild(button);
   }
   console.log('Client Workspace integrations loaded ✓');
 })();
