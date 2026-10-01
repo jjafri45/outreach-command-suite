@@ -24,6 +24,17 @@ button { border-color: #314966; }
 .client-workspace-card { background: #111f31 !important; border-color: #46b8a6 !important; }
 .top-workspace-button { border:1px solid #46b8a6; background:#102b35; color:#d9fff7; border-radius:8px; padding:8px 12px; font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap; }
 .top-workspace-button:hover { background:#174151; color:#fff; }
+.client-workspace-overlay { z-index: 3000 !important; }
+.client-workspace-overlay .modal { max-width: 760px; }
+.workspace-step-label { margin: 20px 0 9px; font-size: 10.5px; font-weight: 700; letter-spacing: .07em; color: var(--ink-3); text-transform: uppercase; }
+.workspace-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.workspace-action { min-height: 112px; padding: 14px; text-align: left; border: 1px solid #314966; border-radius: 10px; background: #0b1726; color: #f4f8fc; cursor: pointer; display: grid; gap: 5px; }
+.workspace-action:hover:not(:disabled) { border-color: #46b8a6; background: #102b35; }
+.workspace-action:disabled { opacity: .5; cursor: not-allowed; }
+.workspace-action span { color: #46b8a6; font-size: 18px; }
+.workspace-action strong { font-size: 13px; }
+.workspace-action small { color: #9badbf; font-size: 11px; line-height: 1.35; }
+@media (max-width: 640px) { .workspace-actions { grid-template-columns: 1fr; } .top-workspace-button { padding: 7px 9px; } }
 
 /* The document previews stay white intentionally; the editor chrome matches Outreach Command. */
 .app .sidebar, .app .editor-panel { background: #0d1929 !important; border-color: #233851 !important; }
