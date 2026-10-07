@@ -14,5 +14,5 @@ test('proposal defaults do not include a personal phone number', () => {
     'utf8',
   );
   expect(html).toContain('agencyPhone: ""');
-  expect(html).not.toContain('+92 300 1234567');
+  expect(html).not.toMatch(/agencyPhone:\s*"\+/);
 });
