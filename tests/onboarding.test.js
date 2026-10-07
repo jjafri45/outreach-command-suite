@@ -77,3 +77,10 @@ test('cancelled clear preserves onboarding', () => {
   expect(localStorage.getItem(key)).toBeNull();
   confirmation.mockRestore();
 });
+
+test('missing onboarding markup is safe', () => {
+  document.body.innerHTML = '';
+  expect(() =>
+    startOnboarding({ doc: document, storage: localStorage, key, onClear: jest.fn() }),
+  ).not.toThrow();
+});

@@ -26,6 +26,17 @@ test('closing restores scroll state', () => {
   expect(document.body.classList.contains('modal-is-open')).toBe(false);
 });
 
+test('close without an argument closes the current modal', () => {
+  modals.open(first);
+  modals.close();
+  expect(modals.active()).toBeNull();
+});
+
+test('close with no open modal remains safe', () => {
+  expect(() => modals.close()).not.toThrow();
+  expect(document.body.classList.contains('modal-is-open')).toBe(false);
+});
+
 test('only one modal can be open', () => {
   modals.open(first);
   modals.open(second);
@@ -38,6 +49,21 @@ test('Escape closes the active modal', () => {
   modals.open(first);
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   expect(first.classList.contains('open')).toBe(false);
+  stop();
+});
+
+test('other keys do not close a modal', () => {
+  const stop = modals.start();
+  modals.open(first);
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  expect(first.classList.contains('open')).toBe(true);
+  stop();
+});
+
+test('Escape is harmless when no modal is open', () => {
+  const stop = modals.start();
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  expect(document.body.classList.contains('modal-is-open')).toBe(false);
   stop();
 });
 

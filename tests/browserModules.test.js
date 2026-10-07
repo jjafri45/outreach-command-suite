@@ -24,3 +24,16 @@ test.each(modules)('%s loads without a window in Node', (file) => {
   vm.runInNewContext(code, sandbox);
   expect(Object.keys(sandbox.module.exports).length).toBeGreaterThan(0);
 });
+
+test.each(modules)('%s CommonJS export does not require a browser window', (file) => {
+  const previousWindow = global.window;
+  try {
+    global.window = undefined;
+    jest.isolateModules(() => {
+      const api = require(path.join('..', 'src', file));
+      expect(Object.keys(api).length).toBeGreaterThan(0);
+    });
+  } finally {
+    global.window = previousWindow;
+  }
+});

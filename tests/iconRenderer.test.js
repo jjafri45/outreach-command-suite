@@ -22,3 +22,8 @@ test('renders known navigation slots and leaves unrelated slots alone', () => {
   expect(document.querySelector('[data-page="ledger"] svg')).not.toBeNull();
   expect(document.querySelector('[data-page="unknown"] .nav-icon').textContent).toBe('keep');
 });
+
+test('navigation link without an icon slot is ignored', () => {
+  document.body.innerHTML = '<nav class="nav"><a data-page="dashboard">Dashboard</a></nav>';
+  expect(() => renderIcons(document)).not.toThrow();
+});
