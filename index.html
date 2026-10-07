@@ -2163,6 +2163,12 @@ tbody tr:hover{background:#162033;}
   </div>
 </div>
 
+<script src="src/config.js"></script>
+<script src="src/data/sampleWorkspace.js"></script>
+<script src="src/data/backup.js"></script>
+<script src="src/ui/iconRenderer.js"></script>
+<script src="src/ui/modalState.js"></script>
+<script src="src/onboarding.js"></script>
 <script>
 // ═══════════════════════════════════════════════
 // CONSTANTS
@@ -2175,8 +2181,6 @@ const LEGACY_MSG_V2      = 'literary_lab_outreach_messages_v2';
 const LEGACY_ACTIVITY    = 'literary_lab_outreach_activities_v2';
 // Current keys (Outreach Command)
 const VERSION            = '2.7';
-const SUPPORT_EMAIL      = 'support@zorqstudio.com';
-const ONBOARDED_KEY      = 'oc_onboarded_v1';
 const STORAGE_KEY_V2     = 'oc_ledger_v2';
 const MESSAGE_KEY_V2     = 'oc_messages_v2';
 const MESSAGE_TEMPLATE_UPDATE_KEY = 'oc_message_templates_2026_09_16';
@@ -2184,7 +2188,7 @@ const ACTIVITY_KEY       = 'oc_activities_v2';
 const SAVED_VIEWS_KEY    = 'oc_saved_views_v1';
 const CUSTOM_FIELDS_KEY  = 'oc_custom_fields_v1';
 const AUDIT_KEY          = 'oc_audit_log_v1';
-const LAST_BACKUP_KEY    = 'oc_last_backup_v1';
+const LAST_BACKUP_KEY    = window.OutreachCommand.config.LAST_BACKUP_KEY;
 const BOT_API_KEY        = 'oc_command_bot_api_key_v1';
 const BOT_LAST_DAILY_KEY = 'oc_personal_bot_last_daily_v1';
 const BOT_CHAT_KEY       = 'oc_personal_bot_chat_v1';
@@ -4453,10 +4457,9 @@ document.querySelectorAll('.days-tab').forEach(btn=>{
 // SETTINGS PAGE
 // ═══════════════════════════════════════════════
 document.getElementById('exportJsonBtn').addEventListener('click',()=>{
-  const backup={
-    version:2,exportDate:new Date().toISOString(),
+  const backup=window.OutreachCommand.backup.createBackup({
     prospects:data,activities,messages,customFields:customFieldDefs,auditLog
-  };
+  });
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -5499,25 +5502,6 @@ document.getElementById('csvPreviewImport').addEventListener('click',()=>{
 // License activation code removed. Outreach Command v2.7 works locally without an account.
 // ONBOARDING
 // ═══════════════════════════════════════════════
-(function initOnboarding(){
-  try{
-    if(!localStorage.getItem(ONBOARDED_KEY)){
-      document.getElementById('onboardOverlay').style.display='flex';
-    }
-  }catch(e){}
-  document.getElementById('onboardKeep').addEventListener('click',()=>{
-    try{localStorage.setItem(ONBOARDED_KEY,'1');}catch(e){}
-    document.getElementById('onboardOverlay').style.display='none';
-  });
-  document.getElementById('onboardClear').addEventListener('click',()=>{
-    if(!confirm('This will clear the sample prospects. Your app starts completely empty. Continue?'))return;
-    data=[];activities={};nextId=1;
-    saveData(data);saveActivities(activities);
-    try{localStorage.setItem(ONBOARDED_KEY,'1');}catch(e){}
-    document.getElementById('onboardOverlay').style.display='none';
-    render();
-  });
-})();
 
 // Chart resize
 window.addEventListener('resize',()=>{
