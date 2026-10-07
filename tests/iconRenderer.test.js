@@ -10,7 +10,7 @@ test.each(Object.keys(paths))('%s renders a valid, accessible SVG', (name) => {
 });
 
 test('unknown icon falls back without injecting markup', () => {
-  const result = iconSvg('bad\"><script>alert(1)</script>');
+  const result = iconSvg('bad"><script>alert(1)</script>');
   expect(result).toContain(paths.dashboard);
   expect(result).not.toContain('<script>');
 });
