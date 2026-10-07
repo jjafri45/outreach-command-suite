@@ -1,1 +1,9 @@
 backup-v2.6-original/
+node_modules/
+coverage/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+npm-debug.log*
