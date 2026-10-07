@@ -2163,6 +2163,12 @@ tbody tr:hover{background:#162033;}
   </div>
 </div>
 
+<script src="src/config.js"></script>
+<script src="src/data/sampleWorkspace.js"></script>
+<script src="src/data/backup.js"></script>
+<script src="src/ui/iconRenderer.js"></script>
+<script src="src/ui/modalState.js"></script>
+<script src="src/onboarding.js"></script>
 <script>
 // ═══════════════════════════════════════════════
 // CONSTANTS
@@ -2175,8 +2181,6 @@ const LEGACY_MSG_V2      = 'literary_lab_outreach_messages_v2';
 const LEGACY_ACTIVITY    = 'literary_lab_outreach_activities_v2';
 // Current keys (Outreach Command)
 const VERSION            = '2.7';
-const SUPPORT_EMAIL      = 'support@zorqstudio.com';
-const ONBOARDED_KEY      = 'oc_onboarded_v1';
 const STORAGE_KEY_V2     = 'oc_ledger_v2';
 const MESSAGE_KEY_V2     = 'oc_messages_v2';
 const MESSAGE_TEMPLATE_UPDATE_KEY = 'oc_message_templates_2026_09_16';
@@ -2184,7 +2188,7 @@ const ACTIVITY_KEY       = 'oc_activities_v2';
 const SAVED_VIEWS_KEY    = 'oc_saved_views_v1';
 const CUSTOM_FIELDS_KEY  = 'oc_custom_fields_v1';
 const AUDIT_KEY          = 'oc_audit_log_v1';
-const LAST_BACKUP_KEY    = 'oc_last_backup_v1';
+const LAST_BACKUP_KEY    = window.OutreachCommand.config.LAST_BACKUP_KEY;
 const BOT_API_KEY        = 'oc_command_bot_api_key_v1';
 const BOT_LAST_DAILY_KEY = 'oc_personal_bot_last_daily_v1';
 const BOT_CHAT_KEY       = 'oc_personal_bot_chat_v1';
@@ -4453,10 +4457,9 @@ document.querySelectorAll('.days-tab').forEach(btn=>{
 // SETTINGS PAGE
 // ═══════════════════════════════════════════════
 document.getElementById('exportJsonBtn').addEventListener('click',()=>{
-  const backup={
-    version:2,exportDate:new Date().toISOString(),
+  const backup=window.OutreachCommand.backup.createBackup({
     prospects:data,activities,messages,customFields:customFieldDefs,auditLog
-  };
+  });
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -5499,25 +5502,6 @@ document.getElementById('csvPreviewImport').addEventListener('click',()=>{
 // License activation code removed. Outreach Command v2.7 works locally without an account.
 // ONBOARDING
 // ═══════════════════════════════════════════════
-(function initOnboarding(){
-  try{
-    if(!localStorage.getItem(ONBOARDED_KEY)){
-      document.getElementById('onboardOverlay').style.display='flex';
-    }
-  }catch(e){}
-  document.getElementById('onboardKeep').addEventListener('click',()=>{
-    try{localStorage.setItem(ONBOARDED_KEY,'1');}catch(e){}
-    document.getElementById('onboardOverlay').style.display='none';
-  });
-  document.getElementById('onboardClear').addEventListener('click',()=>{
-    if(!confirm('This will clear the sample prospects. Your app starts completely empty. Continue?'))return;
-    data=[];activities={};nextId=1;
-    saveData(data);saveActivities(activities);
-    try{localStorage.setItem(ONBOARDED_KEY,'1');}catch(e){}
-    document.getElementById('onboardOverlay').style.display='none';
-    render();
-  });
-})();
 
 // Chart resize
 window.addEventListener('resize',()=>{
@@ -6652,24 +6636,22 @@ setTimeout(()=>{
 // Duplicate-only feature pack. Keeps the original storage keys and CRM data.
 // ═══════════════════════════════════════════════
 (function(){
-  const DEFAULT_OUTREACH_SENDER = 'jari@literarylabstudio.com';
+  const DEFAULT_OUTREACH_SENDER = '';
   const DEFAULT_OUTREACH_SIGNATURE = `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,sans-serif;background-color:#ffffff;color:#111111;border-radius:8px;padding:10px 12px;">
   <tr>
     <td style="width:3px;background:#7B4FD4;border-radius:2px;min-height:72px;">&nbsp;</td>
     <td style="padding-left:16px;vertical-align:top;">
       <p style="margin:0 0 2px 0;font-size:15px;font-weight:600;color:#111111 !important;">
-        Jari Abbas Jafri
+        Your Name
       </p>
       <p style="margin:0 0 10px 0;font-size:12px;color:#7B4FD4 !important;">
-        Founder, Literary Lab
+        Your Role
       </p>
       <p style="margin:0 0 6px 0;font-size:12px;font-weight:600;color:#111111 !important;">
-        Literary Lab<span style="color:#7B4FD4 !important;">.</span>
+        Your Studio<span style="color:#7B4FD4 !important;">.</span>
       </p>
       <p style="margin:0;font-size:12px;color:#555555 !important;line-height:1.9;">
-        <a href="mailto:jari@literarylabstudio.com" style="color:#555555 !important;text-decoration:none;">jari@literarylabstudio.com</a><br>
-        <a href="https://wa.me/923472590983" style="color:#555555 !important;text-decoration:none;">WhatsApp: +92-347-259-0983</a><br>
-        <a href="https://literarylabstudio.com" style="color:#555555 !important;text-decoration:none;">literarylabstudio.com</a>
+        Add your email, phone, and website in the signature settings.
       </p>
     </td>
   </tr>
@@ -6793,10 +6775,8 @@ function doPost(e) {
   e = e || {};
   var payload = JSON.parse((e.postData && e.postData.contents) || '{}');
   if (payload.action !== 'send') return jsonOut({ success: false, error: 'Unsupported action' });
-  var options = {
-    from: payload.from || 'jari@literarylabstudio.com',
-    name: payload.name || 'Muhammad Jari Abbas Jafri'
-  };
+  var options = { name: payload.name || 'Your Studio' };
+  if (payload.from) options.from = payload.from;
   var body = String(payload.body || '').trim();
   if (!body) return jsonOut({ success: false, error: 'Empty body' });
   if (!payload.to) return jsonOut({ success: false, error: 'Missing recipient' });
@@ -7096,7 +7076,7 @@ function doPost(e) {
         </div>
         <button class="btn btn-sm" id="gmailAiSyncNowBtn" type="button">Sync + Check Replies</button>
       </div>
-      <div class="gmail-ai-sub"><strong>Default sender:</strong> ${DEFAULT_OUTREACH_SENDER}</div>
+      <div class="gmail-ai-sub"><strong>Default sender:</strong> your connected Gmail account</div>
       <div class="gmail-ai-signature">
         <label class="form-label" for="gmailAiSignature">CRM HTML signature added when sending</label>
         <textarea class="form-input" id="gmailAiSignature" rows="9">${escapeHtml(getOutreachSignature())}</textarea>
@@ -7358,7 +7338,7 @@ function doPost(e) {
     if(!opts?.silent) setAssistantStatus(`Generating draft for ${row.name}...`);
     const prompt = `Today is ${today()}.
 You are drafting from Outreach Command for Literary Lab.
-Default sender: ${DEFAULT_OUTREACH_SENDER}.
+Default sender: your connected Gmail account.
 Prospect:
 ${JSON.stringify({
   name: row.name,
@@ -7409,7 +7389,7 @@ Return JSON only:
     if(item.kind === 'followup' && item.thread?.subject && !/^re:/i.test(subject)) subject = 'Re: ' + subject;
     const body = cleanEmailDraft(document.querySelector(`[data-gmail-ai-body="${key}"]`)?.value.trim() || gmailAiDrafts[key]?.body || '');
     if(!body){alert('Review/generate a draft first.');return;}
-    if(!confirm(`Send this ${item.kind === 'reply' ? 'reply' : 'follow-up'} to ${row.email} from ${DEFAULT_OUTREACH_SENDER}?`)) return;
+    if(!confirm(`Send this ${item.kind === 'reply' ? 'reply' : 'follow-up'} to ${row.email} from your connected Gmail account?`)) return;
     setAssistantStatus(`Sending to ${row.name}...`);
     try{
       const payload = {
@@ -7420,7 +7400,7 @@ Return JSON only:
         body,
         threadId: item.kind === 'reply' ? (item.thread?.threadId || '') : '',
         from: DEFAULT_OUTREACH_SENDER,
-        name: 'Muhammad Jari Abbas Jafri',
+        name: 'Your Studio',
         signature: getOutreachSignature()
       };
       const res = await fetch(gmailScriptUrl,{
