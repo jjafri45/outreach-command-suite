@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Outreach Command">
+  <rect width="64" height="64" rx="14" fill="#0e1a29"/>
+  <rect x="7" y="7" width="50" height="50" rx="11" fill="#29a793"/>
+  <text x="32" y="40" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="middle">OC</text>
+</svg>
