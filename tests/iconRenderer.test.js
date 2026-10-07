@@ -16,7 +16,8 @@ test('unknown icon falls back without injecting markup', () => {
 });
 
 test('renders known navigation slots and leaves unrelated slots alone', () => {
-  document.body.innerHTML = '<nav class="nav"><a data-page="ledger"><span class="nav-icon"></span></a><a data-page="unknown"><span class="nav-icon">keep</span></a></nav>';
+  document.body.innerHTML =
+    '<nav class="nav"><a data-page="ledger"><span class="nav-icon"></span></a><a data-page="unknown"><span class="nav-icon">keep</span></a></nav>';
   renderIcons(document);
   expect(document.querySelector('[data-page="ledger"] svg')).not.toBeNull();
   expect(document.querySelector('[data-page="unknown"] .nav-icon').textContent).toBe('keep');

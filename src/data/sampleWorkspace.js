@@ -13,7 +13,14 @@
     ['Theo Martin', 'Lumen Health', 'Growth Lead', 'Contacted', 'Email campaign', 3200],
     ['Aisha Khan', 'Harbor & Co.', 'Marketing Director', 'Replied', 'Website copy', 2400],
     ['Noah Williams', 'Vector Works', 'Co-founder', 'Interested', 'Sales deck', 4500],
-    ['Sofia Chen', 'Brightwell Labs', 'Head of Product', 'Proposal Sent', 'Product messaging', 6000],
+    [
+      'Sofia Chen',
+      'Brightwell Labs',
+      'Head of Product',
+      'Proposal Sent',
+      'Product messaging',
+      6000,
+    ],
     ['Liam Brooks', 'Pine & Peak', 'Owner', 'Converted', 'Brand identity', 3800],
     ['Elena Rossi', 'Cedar Finance', 'Operations Director', 'Contacted', 'Content strategy', 2200],
     ['Marcus Reed', 'Atlas Talent', 'CEO', 'New', 'Lead generation', 5000],
@@ -30,30 +37,65 @@
   ];
 
   function sampleWorkspace(now = new Date()) {
-    const prospects = people.map(([name, company, jobTitle, status, service, dealValue], index) => ({
-      id: index + 1,
-      name, company, jobTitle, status, service,
-      industry: 'Professional Services', location: 'Remote',
-      email: `sample${index + 1}@example.com`, linkedinUrl: '',
-      dateAdded: isoDay(-30 + index, now),
-      dateContacted: status === 'New' ? '' : isoDay(-18 + index, now),
-      hook: ['Warm check-in', 'Value-first', 'Curiosity', 'Direct'][index % 4],
-      nextFollowup: ['Converted', 'Not Interested', 'New'].includes(status)
-        ? '' : isoDay(index % 4 === 0 ? 0 : index % 5 - 2, now),
-      followupCount: index % 3, followupSent: false, linkSent: false,
-      leadSource: ['LinkedIn', 'Referral', 'Email', 'Event'][index % 4],
-      dealValue: `$${dealValue}`, tags: ['Sample data', index % 3 === 0 ? 'Hot lead' : ''],
-      tasks: index % 5 === 0 ? [{ id: `sample-task-${index}`, title: 'Prepare follow-up',
-        due: isoDay(0, now), done: false, createdAt: now.toISOString() }] : [],
-      customFields: {}, outcomeReason: '',
-      notes: 'Sample data. Replace or clear these records when you are ready.',
-      interestedDate: ['Interested', 'Proposal Sent', 'Converted'].includes(status)
-        ? isoDay(-7, now) : '',
-    }));
-    const activities = Object.fromEntries(prospects.filter((row) => row.status !== 'New').map((row) => [
-      row.id, [{ type: 'Message Sent', date: row.dateContacted || isoDay(-1, now),
-        note: 'Sample outreach activity', ts: now.getTime() }],
-    ]));
+    const prospects = people.map(
+      ([name, company, jobTitle, status, service, dealValue], index) => ({
+        id: index + 1,
+        name,
+        company,
+        jobTitle,
+        status,
+        service,
+        industry: 'Professional Services',
+        location: 'Remote',
+        email: `sample${index + 1}@example.com`,
+        linkedinUrl: '',
+        dateAdded: isoDay(-30 + index, now),
+        dateContacted: status === 'New' ? '' : isoDay(-18 + index, now),
+        hook: ['Warm check-in', 'Value-first', 'Curiosity', 'Direct'][index % 4],
+        nextFollowup: ['Converted', 'Not Interested', 'New'].includes(status)
+          ? ''
+          : isoDay(index % 4 === 0 ? 0 : (index % 5) - 2, now),
+        followupCount: index % 3,
+        followupSent: false,
+        linkSent: false,
+        leadSource: ['LinkedIn', 'Referral', 'Email', 'Event'][index % 4],
+        dealValue: `$${dealValue}`,
+        tags: ['Sample data', index % 3 === 0 ? 'Hot lead' : ''],
+        tasks:
+          index % 5 === 0
+            ? [
+                {
+                  id: `sample-task-${index}`,
+                  title: 'Prepare follow-up',
+                  due: isoDay(0, now),
+                  done: false,
+                  createdAt: now.toISOString(),
+                },
+              ]
+            : [],
+        customFields: {},
+        outcomeReason: '',
+        notes: 'Sample data. Replace or clear these records when you are ready.',
+        interestedDate: ['Interested', 'Proposal Sent', 'Converted'].includes(status)
+          ? isoDay(-7, now)
+          : '',
+      }),
+    );
+    const activities = Object.fromEntries(
+      prospects
+        .filter((row) => row.status !== 'New')
+        .map((row) => [
+          row.id,
+          [
+            {
+              type: 'Message Sent',
+              date: row.dateContacted || isoDay(-1, now),
+              note: 'Sample outreach activity',
+              ts: now.getTime(),
+            },
+          ],
+        ]),
+    );
     return { prospects, activities };
   }
 

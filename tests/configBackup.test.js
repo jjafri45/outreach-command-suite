@@ -8,10 +8,19 @@ test('support email is valid', () => {
 });
 
 test('backup contains selected CRM data but never API keys', () => {
-  const backup = createBackup({
-    prospects: [{ id: 1 }], activities: {}, messages: [], customFields: [], auditLog: [],
-    apiKey: 'secret', openaiKey: 'secret', token: 'secret',
-  }, new Date('2026-10-08T00:00:00.000Z'));
+  const backup = createBackup(
+    {
+      prospects: [{ id: 1 }],
+      activities: {},
+      messages: [],
+      customFields: [],
+      auditLog: [],
+      apiKey: 'secret',
+      openaiKey: 'secret',
+      token: 'secret',
+    },
+    new Date('2026-10-08T00:00:00.000Z'),
+  );
   expect(backup.version).toBe(2);
   expect(backup.prospects).toEqual([{ id: 1 }]);
   expect(backup.exportDate).toBe('2026-10-08T00:00:00.000Z');

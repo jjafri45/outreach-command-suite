@@ -9,7 +9,9 @@
       if (isOpen) options.scrollToTop?.();
     }
     function open(element) {
-      doc.querySelectorAll('.modal-overlay.open').forEach((modal) => modal.classList.remove('open'));
+      doc
+        .querySelectorAll('.modal-overlay.open')
+        .forEach((modal) => modal.classList.remove('open'));
       element.classList.add('open');
       sync();
     }
@@ -37,7 +39,11 @@
       const observer = new MutationObserver(sync);
       observer.observe(doc.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
       sync();
-      return () => { observer.disconnect(); doc.removeEventListener('keydown', handleKey, true); doc.removeEventListener('click', handleClick); };
+      return () => {
+        observer.disconnect();
+        doc.removeEventListener('keydown', handleKey, true);
+        doc.removeEventListener('click', handleClick);
+      };
     }
     return { active, open, close, sync, start };
   }

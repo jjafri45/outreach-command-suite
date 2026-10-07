@@ -6,7 +6,8 @@ let modals;
 
 beforeEach(() => {
   document.body.className = '';
-  document.body.innerHTML = '<div id="first" class="modal-overlay"><section class="modal"><button>Inside</button></section></div><div id="second" class="modal-overlay"></div><div id="page-gmail"></div>';
+  document.body.innerHTML =
+    '<div id="first" class="modal-overlay"><section class="modal"><button>Inside</button></section></div><div id="second" class="modal-overlay"></div><div id="page-gmail"></div>';
   first = document.getElementById('first');
   second = document.getElementById('second');
   modals = createModalState(document);
@@ -57,7 +58,9 @@ test('click inside keeps the modal open', () => {
 });
 
 test('Gmail closes through its supplied callback', () => {
-  const closeGmail = jest.fn(() => document.getElementById('page-gmail').classList.remove('active'));
+  const closeGmail = jest.fn(() =>
+    document.getElementById('page-gmail').classList.remove('active'),
+  );
   modals = createModalState(document, { closeGmail });
   const stop = modals.start();
   document.getElementById('page-gmail').classList.add('active');

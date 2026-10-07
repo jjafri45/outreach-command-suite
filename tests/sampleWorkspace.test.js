@@ -11,7 +11,16 @@ describe('sample workspace', () => {
 
   test('every prospect has the fields the CRM needs', () => {
     for (const row of sampleWorkspace(now).prospects) {
-      for (const field of ['id', 'name', 'company', 'jobTitle', 'status', 'service', 'dateAdded', 'email']) {
+      for (const field of [
+        'id',
+        'name',
+        'company',
+        'jobTitle',
+        'status',
+        'service',
+        'dateAdded',
+        'email',
+      ]) {
         expect(row[field]).toBeTruthy();
       }
       expect(row.tags).toContain('Sample data');
@@ -21,7 +30,17 @@ describe('sample workspace', () => {
 
   test('represents every pipeline stage', () => {
     const stages = new Set(sampleWorkspace(now).prospects.map((row) => row.status));
-    expect(stages).toEqual(new Set(['New', 'Contacted', 'Replied', 'Interested', 'Proposal Sent', 'Converted', 'Not Interested']));
+    expect(stages).toEqual(
+      new Set([
+        'New',
+        'Contacted',
+        'Replied',
+        'Interested',
+        'Proposal Sent',
+        'Converted',
+        'Not Interested',
+      ]),
+    );
   });
 
   test('has valid dates whenever a date is present', () => {

@@ -3,7 +3,8 @@ const key = 'test_onboarded';
 
 beforeEach(() => {
   localStorage.clear();
-  document.body.innerHTML = '<div id="onboardOverlay" style="display:none"><button id="onboardKeep">Keep</button><button id="onboardClear">Clear</button></div>';
+  document.body.innerHTML =
+    '<div id="onboardOverlay" style="display:none"><button id="onboardKeep">Keep</button><button id="onboardClear">Clear</button></div>';
 });
 
 test('empty storage shows first-run onboarding', () => {
@@ -29,7 +30,11 @@ test('corrupted stored value is treated as first run', () => {
 
 test('storage read failure warns and does not crash', () => {
   const warning = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  const storage = { getItem: () => { throw new Error('blocked'); } };
+  const storage = {
+    getItem: () => {
+      throw new Error('blocked');
+    },
+  };
   expect(readOnboarded(storage, key)).toBe(false);
   startOnboarding({ doc: document, storage, key, onClear: jest.fn() });
   expect(document.getElementById('onboardOverlay').style.display).toBe('flex');
@@ -39,7 +44,16 @@ test('storage read failure warns and does not crash', () => {
 
 test('storage write failure warns and does not crash', () => {
   const warning = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  expect(writeOnboarded({ setItem: () => { throw new Error('blocked'); } }, key)).toBe(false);
+  expect(
+    writeOnboarded(
+      {
+        setItem: () => {
+          throw new Error('blocked');
+        },
+      },
+      key,
+    ),
+  ).toBe(false);
   expect(warning).toHaveBeenCalled();
   warning.mockRestore();
 });

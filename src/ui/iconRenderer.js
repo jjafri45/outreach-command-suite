@@ -7,7 +7,8 @@
     messages: 'M4 5h16v12H7l-3 3z',
     today: 'M12 3v18 M3 12h18',
     gmail: 'M3 5h18v14H3z M3 7l9 6 9-6',
-    settings: 'M12 3v3 M12 18v3 M3 12h3 M18 12h3 M5.6 5.6l2.1 2.1 M16.3 16.3l2.1 2.1 M18.4 5.6l-2.1 2.1 M7.7 16.3l-2.1 2.1 M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',
+    settings:
+      'M12 3v3 M12 18v3 M3 12h3 M18 12h3 M5.6 5.6l2.1 2.1 M16.3 16.3l2.1 2.1 M18.4 5.6l-2.1 2.1 M7.7 16.3l-2.1 2.1 M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',
   });
   function iconSvg(name) {
     const path = Object.hasOwn(paths, name) ? paths[name] : paths.dashboard;
@@ -16,7 +17,8 @@
   function renderIcons(doc) {
     doc.querySelectorAll('.nav a[data-page]').forEach((link) => {
       const slot = link.querySelector('.nav-icon');
-      if (slot && Object.hasOwn(paths, link.dataset.page)) slot.innerHTML = iconSvg(link.dataset.page);
+      if (slot && Object.hasOwn(paths, link.dataset.page))
+        slot.innerHTML = iconSvg(link.dataset.page);
     });
   }
   const api = { iconSvg, renderIcons, paths };
