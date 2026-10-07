@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="outreach-command-favicon.svg">
 <link rel="stylesheet" href="theme.css?v=20261001">
-<title>Outreach Command v2.6 — Sales Command Dashboard</title>
+<title>Outreach Command v2.7 | Sales Dashboard</title>
 <style>
 /* ════════════════════════════════════════════════
    OUTREACH COMMAND — Design System v3
@@ -601,12 +601,19 @@ tbody tr:hover{background:rgba(16,185,129,.04);cursor:pointer;}
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
 }
 .modal-overlay.open{display:flex;}
+body.modal-is-open{overflow:hidden;}
 .modal{
   background:var(--bg-raised);
   border:1px solid var(--border-2);
   border-radius:12px;box-shadow:var(--shadow-lg);
   width:100%;max-width:640px;max-height:90vh;overflow-y:auto;
   display:flex;flex-direction:column;
+}
+@media(max-width:640px){
+  .modal-overlay{padding:12px;align-items:center;}
+  .modal{max-width:calc(100vw - 24px);max-height:90vh;}
+  .modal-body{padding:16px;}
+  .modal-head,.modal-foot{padding-left:16px;padding-right:16px;}
 }
 .modal-head{
   display:flex;align-items:center;justify-content:space-between;
@@ -1736,13 +1743,13 @@ tbody tr:hover{background:#162033;}
 
   <div class="settings-section">
     <h3>📦 JSON Backup</h3>
-    <p>Export your complete workspace — prospects, activities, and message templates. Import to restore.</p>
+    <p>Export your complete workspace: prospects, activities, and message templates. Import to restore.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn btn-primary" id="exportJsonBtn">Export Backup (.json)</button>
       <label class="btn" for="importJsonFile">Import Backup (.json)</label>
       <input type="file" id="importJsonFile" accept=".json" style="display:none">
     </div>
-    <div class="warn-box"><strong>⚠️ IMPORTANT — Read before you use this app</strong>Your data lives inside <strong>this specific browser</strong> only. If you open this file in a different browser (e.g. Chrome vs Firefox vs Edge), your data will not be there. Clearing your browser history or site data will also erase everything permanently.<br><br>Export a JSON backup regularly and keep it somewhere safe. That backup is your only recovery option.</div>
+    <div class="warn-box"><strong>Important</strong> Your data is stored in this browser. AI chat and Gmail sync only send data when you turn them on. Export a JSON backup regularly and keep it somewhere safe.</div>
   </div>
 
   <div class="settings-section">
@@ -1753,18 +1760,6 @@ tbody tr:hover{background:#162033;}
       <input type="file" id="importCsvFile" accept=".csv,text/csv" style="display:none">
       <button class="btn" id="exportCsvBtn">Export CSV</button>
     </div>
-  </div>
-
-  <div class="settings-section">
-    <h3>📊 Excel Export / Import</h3>
-    <p>Export to Excel-compatible format. Includes all prospect fields and activity log. Import only works with files exported from this app.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn" id="exportExcelBtn">Export Excel (.xls)</button>
-      <button class="btn" id="linkExcelBtn" title="Requires Chrome or Edge. May not work when opened as a local file.">Link Excel ⚠️</button>
-      <label class="btn" for="importExcelFile">Import Excel</label>
-      <input type="file" id="importExcelFile" accept=".xls,.xml,application/vnd.ms-excel,text/xml" style="display:none">
-    </div>
-    <div style="font-size:11px;color:#a49a8d;margin-top:8px;">⚠️ Live Link Excel requires Chrome/Edge and may not work when this file is opened directly from your computer (file:// protocol). Use Export/Import Excel instead.</div>
   </div>
 
   <div class="settings-section">
@@ -1792,13 +1787,7 @@ tbody tr:hover{background:#162033;}
 </div>
 
 <footer>
-  Outreach Command v2.6 Personal Copy &nbsp;·&nbsp; Data stored locally in your browser &nbsp;·&nbsp; License check disabled for owner use
-  <br style="margin-bottom:5px">
-  © 2026 Abhi Soucha Nahi Hai &nbsp;·&nbsp; Made with ❤️ for my Freelancer Buddies
-  <br style="margin-bottom:5px">
-  📧 <a href="mailto:jjafri45@gmail.com" style="color:var(--coral);text-decoration:none;">jjafri45@gmail.com</a>
-  &nbsp;·&nbsp;
-  📞 <a href="tel:+923166284254" style="color:var(--coral);text-decoration:none;">+92-316-6284254</a>
+  Outreach Command v2.7 by Zorq Studio &nbsp;·&nbsp; <a id="supportEmailLink" href="#" style="color:var(--coral);text-decoration:none;"></a> &nbsp;·&nbsp; <button class="footer-link" id="termsPrivacyBtn" type="button">Terms and Privacy</button>
 </footer>
 </main>
 </div>
@@ -1822,13 +1811,13 @@ tbody tr:hover{background:#162033;}
   </div>
   <div class="bot-body">
     <div class="bot-card" id="botKeyCard">
-      <div class="bot-card-title">Private API Key</div>
+      <div class="bot-card-title">Your Gemini API Key</div>
       <div class="bot-row">
-        <input class="form-input" type="password" id="botApiKey" placeholder="Paste your free Gemini API key">
+        <input class="form-input" type="password" id="botApiKey" placeholder="Paste your own Gemini API key">
         <button class="btn" id="botSaveKey" type="button">Save</button>
         <button class="btn" id="botClearKey" type="button">Clear</button>
       </div>
-      <div class="bot-small">Used only in this personal browser copy. Do not send this no-key file to clients after adding your private key.</div>
+      <div class="bot-small">Create your own key at Google AI Studio. It is stored only in this browser and is never included in a JSON backup. Never share this app file after adding a key.</div>
     </div>
 
     <div class="bot-connected" id="botKeyConnected">
@@ -2057,33 +2046,6 @@ tbody tr:hover{background:#162033;}
 </div>
 
 <!-- ═══════════════════════════════════════════════
-  ACTIVATION MODAL (license check — shown before onboarding)
-═══════════════════════════════════════════════ -->
-<div id="actOverlay" class="act-overlay" style="display:none;">
-  <div class="act-box">
-    <div class="act-logo">
-      <div class="act-logo-mark">↗</div>
-      <div>
-        <div class="act-logo-name">Outreach Command</div>
-        <div class="act-logo-tag">License Activation</div>
-      </div>
-    </div>
-    <div class="act-title">Activate your copy</div>
-    <div class="act-sub">Enter the license key from your purchase confirmation to unlock the dashboard. Internet is required for license checks.</div>
-    <div class="act-field">
-      <label>LICENSE KEY</label>
-      <input type="text" id="actKeyInput" placeholder="OC-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
-    </div>
-    <div id="actMsg" class="act-msg"></div>
-    <button class="act-btn" id="actSubmit" onclick="doActivate()">Activate →</button>
-    <div class="act-footer">
-      Need help? Message the seller with your license key and proof of purchase.<br>
-      Your data is stored locally — no account needed after activation.
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════
   ONBOARDING MODAL (first launch only)
 ═══════════════════════════════════════════════ -->
 <div id="onboardOverlay" class="onboard-overlay" style="display:none;">
@@ -2091,10 +2053,10 @@ tbody tr:hover{background:#162033;}
     <div class="onboard-logo">
       <div class="brand-mark" style="width:22px;height:22px;"><span></span><span></span><span></span><span></span></div>
       <span style="font-weight:800;font-size:18px;color:#1f1b18;">Outreach Command</span>
-      <span style="font-size:11px;color:#a09484;margin-left:4px;">v2.6</span>
+      <span style="font-size:11px;color:#a09484;margin-left:4px;">v2.7</span>
     </div>
-    <div class="onboard-title">Welcome — let's get you set up 👋</div>
-    <div class="onboard-sub">Outreach Command is a private, offline CRM for freelancers doing cold outreach. Everything stays on your device — no accounts, no subscriptions.</div>
+    <div class="onboard-title">Welcome, let's get you set up 👋</div>
+    <div class="onboard-sub">Your data is stored in this browser. AI chat and Gmail sync only send data when you turn them on.</div>
     <div class="onboard-steps">
       <div class="onboard-step">
         <div class="onboard-step-num">1</div>
@@ -2212,14 +2174,9 @@ const LEGACY_KEY_V2      = 'literary_lab_outreach_ledger_v2';
 const LEGACY_MSG_V2      = 'literary_lab_outreach_messages_v2';
 const LEGACY_ACTIVITY    = 'literary_lab_outreach_activities_v2';
 // Current keys (Outreach Command)
-const VERSION            = '2.5';
+const VERSION            = '2.7';
+const SUPPORT_EMAIL      = 'support@zorqstudio.com';
 const ONBOARDED_KEY      = 'oc_onboarded_v1';
-const ACTIVATION_KEY     = 'oc_activated_v1';
-const ACTIVATION_COOKIE  = 'oc_activated_v1_backup';
-const ACTIVATION_DB      = 'oc_activation_db_v1';
-const ACTIVATION_STORE   = 'activation';
-// ↓ Set this to YOUR deployed Cloudflare Worker URL
-const WORKER_URL         = 'https://oc-license.jjafri45.workers.dev';
 const STORAGE_KEY_V2     = 'oc_ledger_v2';
 const MESSAGE_KEY_V2     = 'oc_messages_v2';
 const MESSAGE_TEMPLATE_UPDATE_KEY = 'oc_message_templates_2026_09_16';
@@ -2228,7 +2185,7 @@ const SAVED_VIEWS_KEY    = 'oc_saved_views_v1';
 const CUSTOM_FIELDS_KEY  = 'oc_custom_fields_v1';
 const AUDIT_KEY          = 'oc_audit_log_v1';
 const LAST_BACKUP_KEY    = 'oc_last_backup_v1';
-const BOT_API_KEY        = 'oc_personal_gemini_api_key_v1';
+const BOT_API_KEY        = 'oc_command_bot_api_key_v1';
 const BOT_LAST_DAILY_KEY = 'oc_personal_bot_last_daily_v1';
 const BOT_CHAT_KEY       = 'oc_personal_bot_chat_v1';
 const BOT_MODELS         = ['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash-lite','gemini-2.5-flash-lite'];
@@ -2256,57 +2213,7 @@ const seedData = [
   {id:6,name:'Sam Holden',linkedinUrl:'',jobTitle:'Head of Content',company:'Holden Media',industry:'Publishing',location:'Toronto, CA',email:'',dateAdded:'2026-08-25',dateContacted:'2026-08-25',hook:'Warm check-in',status:'Not Interested',nextFollowup:'',followupCount:0,followupSent:false,linkSent:false,leadSource:'LinkedIn',service:'',dealValue:'',notes:'Politely declined. Currently working with another agency. Left door open.'}
 ];
 
-// Literary Lab publisher outreach sent on September 8, 2026.
-// These records are merged into existing browser data once, without replacing
-// or modifying prospects the user has already saved.
-const literaryLabPublisherProspects = [
-  {name:'Tony Chellini',linkedinUrl:'https://www.linkedin.com/in/tonychellini',jobTitle:'Co-owner & President',company:'Gatekeeper Press',industry:'Book Publishing',location:'United States',email:'info@gatekeeperpress.com',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial partnership email sent on 2026-09-08. Proposed white-label and overflow support for cover design, interior formatting, EPUB, KDP, and IngramSpark production. First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'J.J. Hebert',linkedinUrl:'',jobTitle:'Founder & CEO',company:'MindStir Media',industry:'Book Publishing',location:'Portsmouth, New Hampshire, United States',email:'info@mindstirmedia.com',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial partnership email sent on 2026-09-08. Proposed white-label and overflow production capacity for covers, interiors, EPUB, KDP, and IngramSpark files. First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Alex Kale',linkedinUrl:'',jobTitle:'Book Production Director',company:'Atmosphere Press',industry:'Book Publishing',location:'Colorado, United States',email:'books@atmospherepress.com',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Direct',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial partnership email sent on 2026-09-08. Proposed external production support for busy schedules and projects requiring additional cover or interior-layout capacity. First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Christina Henry de Tessan',linkedinUrl:'https://www.linkedin.com/in/christina-henry-de-tessan-4950764',jobTitle:'Owner & Chief Partnerships Officer',company:'Girl Friday Productions',industry:'Book Publishing',location:'Seattle, Washington, United States',email:'',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Value-first',status:'Not Interested',nextFollowup:'',followupCount:0,followupSent:false,linkSent:false,leadSource:'LinkedIn',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'LinkedIn connection request sent with a short partnership note on 2026-09-08. Connection request was not accepted after seven days. Closed as Not Interested on 2026-09-15; do not follow up.'},
-  {name:'Nina Spahn',linkedinUrl:'',jobTitle:'COO',company:'Amplify Publishing Group',industry:'Book Publishing',location:'Washington, DC area, United States',email:'nina@amplifypublishing.com',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial white-label production partnership email sent to Nina Spahn on 2026-09-08. Offered a paid pilot or overflow assignment for covers, interiors, EPUB, and KDP/IngramSpark-ready files. First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Adrineh Der-Boghossian',linkedinUrl:'',jobTitle:'Managing Editor',company:'Page Two',industry:'Book Publishing',location:'Vancouver, British Columbia, Canada',email:'hello@pagetwo.com',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial production partnership email sent on 2026-09-08. Offered white-label cover, interior, EPUB, and platform-ready overflow support, with a paid pilot as the next step. First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Elissa Graeser',linkedinUrl:'',jobTitle:'Book Production Expert',company:'Book Launchers',industry:'Book Publishing',location:'Las Vegas, Nevada, United States',email:'team@booklaunchers.com',dateAdded:'2026-09-08',dateContacted:'2026-09-08',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial production partnership email sent on 2026-09-08. Offered white-label cover design, print and ebook interiors, EPUB conversion, and a paid pilot project. First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Kayleigh Rucinski',linkedinUrl:'',jobTitle:'Director of Production',company:'Ballast Books',industry:'Book Publishing',location:'United States',email:'',dateAdded:'2026-09-09',dateContacted:'2026-09-09',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-16',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial overflow-production partnership email sent on 2026-09-09. Offered a paid pilot covering book design, interiors, EPUB, or platform-ready files. Exact recipient address was not recorded.'},
-  {name:'Timothy Lindsay',linkedinUrl:'',jobTitle:'Founder & CEO',company:'Tellwell Publishing',industry:'Book Publishing',location:'Victoria, British Columbia, Canada',email:'info@tellwell.ca',dateAdded:'2026-09-09',dateContacted:'2026-09-09',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-16',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial white-label production partnership email sent on 2026-09-09. Proposed flexible overflow capacity and a paid pilot.'},
-  {name:'Scott A. MacMillan',linkedinUrl:'',jobTitle:'Chief Strategist & Executive Publisher',company:'Grammar Factory',industry:'Book Publishing',location:'Toronto, Ontario, Canada',email:'info@grammarfactory.com',dateAdded:'2026-09-09',dateContacted:'2026-09-09',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-16',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority','AI-aligned'],notes:'Initial partnership email sent on 2026-09-09. Positioned Literary Lab as human-led, AI-assisted production capacity for covers, interiors, EPUB, and platform-ready files.'},
-  {name:'Jenn T. Grace',linkedinUrl:'',jobTitle:'Founder & CEO',company:'Publish Your Purpose',industry:'Book Publishing',location:'Hartford, Connecticut, United States',email:'jgrace@publishyourpurpose.com',dateAdded:'2026-09-09',dateContacted:'2026-09-09',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-16',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'The first attempt to grace@publishyourpurpose.com bounced because the address was entered incorrectly. The partnership email was then sent to the corrected address, jgrace@publishyourpurpose.com, on 2026-09-09. Follow up if there is no response by 2026-09-16.'},
-  {name:'Keri-Rae Barnum',linkedinUrl:'',jobTitle:'Owner & CEO',company:'New Shelves Books',industry:'Book Publishing Services',location:'United States',email:'keri@newshelves.com',dateAdded:'2026-09-09',dateContacted:'2026-09-09',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-16',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'Publishing Referral Partnership',dealValue:'',tags:['Publisher','Referral','Partnership','Priority'],notes:'Initial referral and production-resource partnership email sent on 2026-09-09. Offered Literary Lab as a vetted design and production option for suitable authors and small presses.'},
-  {name:'Carrie Jones',linkedinUrl:'',jobTitle:'Chief Operating Officer',company:'Greenleaf Book Group',industry:'Book Publishing',location:'Austin, Texas, United States',email:'cjones@greenleafbookgroup.com',dateAdded:'2026-09-09',dateContacted:'2026-09-09',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-16',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial production partnership email sent on 2026-09-09. Offered a paid pilot for future overflow or specialist cover, interior, or EPUB production.'},
-  {name:'David L. Hancock',linkedinUrl:'',jobTitle:'Founder & Publisher',company:'Morgan James Publishing',industry:'Book Publishing',location:'United States',email:'hello@morganjamespublishing.com',dateAdded:'2026-09-13',dateContacted:'2026-09-13',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-21',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial collaboration email sent to David L. Hancock on 2026-09-13.'},
-  {name:'Melanie',linkedinUrl:'',jobTitle:'Publishing Contact',company:'Elite Online Publishing',industry:'Book Publishing',location:'United States',email:'Melanie@EliteOnlinePublishing.com',dateAdded:'2026-09-13',dateContacted:'2026-09-13',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-21',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority','AI-aligned'],notes:'Initial collaboration email sent to Melanie on 2026-09-13. The verified outreach pack records only her first name.'},
-  {name:'Tammara Kennelly',linkedinUrl:'',jobTitle:'President',company:'FriesenPress',industry:'Book Publishing',location:'Victoria, British Columbia, Canada',email:'publishing@friesenpress.com',dateAdded:'2026-09-13',dateContacted:'2026-09-13',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-21',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial collaboration email sent for Tammara Kennelly on 2026-09-13.'},
-  {name:'Julie Scott',linkedinUrl:'',jobTitle:'General Manager',company:'Grosvenor House Publishing',industry:'Book Publishing',location:'United Kingdom',email:'info@grosvenorhousepublishing.co.uk',dateAdded:'2026-09-13',dateContacted:'2026-09-13',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-21',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial collaboration email sent for Julie Scott on 2026-09-13.'},
-  {name:'Peter Licalzi',linkedinUrl:'',jobTitle:'Cofounder & CEO',company:'Blue Star Press',industry:'Book Publishing',location:'United States',email:'contact@bluestarpress.com',dateAdded:'2026-09-13',dateContacted:'2026-09-13',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-21',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Initial collaboration email sent for Peter Licalzi on 2026-09-13.'},
-  {name:'Monica Lowry',linkedinUrl:'',jobTitle:'Production Manager',company:'BenBella Books',industry:'Book Publishing',location:'United States',email:'monica@benbellabooks.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized overflow-production email sent to Monica Lowry on 2026-09-16. Offered a concise portfolio and one paid overflow assignment.'},
-  {name:'Chris Hemesath',linkedinUrl:'',jobTitle:'Production Manager',company:'The Collective Book Studio',industry:'Book Publishing',location:'United States',email:'info@thecollectivebook.studio',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized production-support email sent for Chris Hemesath on 2026-09-16 through the company inbox. Offered a paid cover-and-interior pilot or future overflow work.'},
-  {name:'Chhavi Bhargava',linkedinUrl:'',jobTitle:'Publishing Executive',company:'IdeaPress Publishing',industry:'Book Publishing',location:'United States',email:'chhavi@ideapresspublishing.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized business-book design partnership email sent to Chhavi Bhargava on 2026-09-16. Offered a concise portfolio and one paid evaluation project.'},
-  {name:'Devin DeVries',linkedinUrl:'',jobTitle:'Production Lead',company:'Indie Books International',industry:'Book Publishing',location:'United States',email:'devin@indiebooksintl.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized production-support email sent to Devin DeVries on 2026-09-16. Proposed a paid pilot for Indie Books International.'},
-  {name:'Milli Brown',linkedinUrl:'',jobTitle:'Founder & CEO',company:'Brown Books Publishing Group',industry:'Book Publishing',location:'United States',email:'publishing@brownbooks.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:true,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized freelance-production email sent for Milli Brown on 2026-09-16 through the publishing inbox. The Google Drive portfolio link was included. Offered a paid freelance or overflow assignment.'},
-  {name:'Suanne Laqueur',linkedinUrl:'',jobTitle:'Director of Production',company:'DartFrog Books',industry:'Book Publishing',location:'United States',email:'support@dartfrogbooks.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized white-label production email sent for Suanne Laqueur on 2026-09-16 through the support inbox. Offered one paid cover, interior, or conversion assignment.'},
-  {name:'Jennifer Gallinger',linkedinUrl:'',jobTitle:'Production Contact',company:'ECW Press',industry:'Book Publishing',location:'Canada',email:'jennifer@ecwpress.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized production-overflow email sent to Jennifer Gallinger on 2026-09-16. Offered one paid overflow assignment.'},
-  {name:'Holly Kammier',linkedinUrl:'',jobTitle:'Publishing Director & Co-founder',company:'Acorn Publishing',industry:'Book Publishing',location:'United States',email:'contact@acornpublishingllc.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized production-capacity email sent for Holly Kammier on 2026-09-16 through the company inbox. Offered a paid cover-and-interior project or smaller overflow assignment.'},
-  {name:'Jen Wahi',linkedinUrl:'',jobTitle:'President & CEO',company:'Mission Point Press',industry:'Book Publishing',location:'United States',email:'info@missionpointpress.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized growth and production-support email sent for Jen Wahi on 2026-09-16 through the company inbox. Offered a paid overflow pilot.'},
-  {name:'Carol Jones',linkedinUrl:'',jobTitle:'Production Manager',company:'Lucid Books',industry:'Book Publishing',location:'United States',email:'info@lucidbooks.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized production-capacity email sent for Carol Jones on 2026-09-16 through the company inbox. Offered a focused portfolio and pricing outline for one paid pilot.'},
-  {name:'Christopher Wold',linkedinUrl:'',jobTitle:'Partnerships Director',company:'Whitefox',industry:'Publishing Services',location:'United Kingdom',email:'info@wearewhitefox.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized partner-network email sent for Christopher Wold on 2026-09-16 through the company inbox. Offered one paid trial assignment.'},
-  {name:'Amy Quale',linkedinUrl:'',jobTitle:'Co-founder & Chief Publishing Officer',company:'Wise Ink Media',industry:'Book Publishing',location:'United States',email:'editor@wiseink.com',dateAdded:'2026-09-16',dateContacted:'2026-09-16',hook:'Value-first',status:'Contacted',nextFollowup:'2026-09-23',followupCount:0,followupSent:false,linkSent:false,leadSource:'Email',service:'White-label Book Production',dealValue:'',tags:['Publisher','Partnership','Priority'],notes:'Personalized specialist-network email sent for Amy Quale on 2026-09-16 through the editorial inbox. Offered one paid pilot assignment.'}
-];
-
-// One-time update for the follow-ups completed on September 15, 2026.
-// This also updates records already stored in the browser without disturbing
-// unrelated prospect details or later manual edits.
-const LITERARY_LAB_FOLLOWUP_UPDATE_KEY = 'oc_literary_lab_followups_2026_09_15';
-const literaryLabFollowupUpdates = [
-  {name:'Tony Chellini',company:'Gatekeeper Press',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,notesAppend:'First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'J.J. Hebert',company:'MindStir Media',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,notesAppend:'First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Alex Kale',company:'Atmosphere Press',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,notesAppend:'First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Christina Henry de Tessan',company:'Girl Friday Productions',status:'Not Interested',nextFollowup:'',followupCount:0,followupSent:false,linkSent:false,notesAppend:'Connection request was not accepted after seven days. Closed as Not Interested on 2026-09-15; do not follow up.'},
-  {name:'Nina Spahn',company:'Amplify Publishing Group',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,notesAppend:'First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Adrineh Der-Boghossian',company:'Page Two',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,notesAppend:'First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'},
-  {name:'Elissa Graeser',company:'Book Launchers',status:'Contacted',nextFollowup:'2026-09-22',followupCount:1,followupSent:true,linkSent:true,notesAppend:'First follow-up sent on 2026-09-15 with portfolio link and paid-pilot offer. Final follow-up scheduled for 2026-09-22.'}
-];
-
-// ═══════════════════════════════════════════════
+// Historical personal outreach records intentionally removed from the public v2.7 source.
 // DATA MIGRATION v1 → v2
 // ═══════════════════════════════════════════════
 function migrateStatusV1(old){
@@ -2387,58 +2294,7 @@ function migrateProspect(r, idx){
 }
 
 function mergeLiteraryLabPublisherProspects(existing){
-  const merged = Array.isArray(existing) ? existing.slice() : [];
-  let nextProspectId = Math.max(0,...merged.map(row=>Number(row.id)||0))+1;
-  let changed = false;
-
-  literaryLabPublisherProspects.forEach(prospect=>{
-    const email = String(prospect.email||'').trim().toLowerCase();
-    const name = String(prospect.name||'').trim().toLowerCase();
-    const company = String(prospect.company||'').trim().toLowerCase();
-    const placeholderIndex = merged.findIndex(row=>
-      String(row.name||'').trim().toLowerCase()==='publishing partnerships team' &&
-      String(row.company||'').trim().toLowerCase()===company
-    );
-    if(placeholderIndex>=0){
-      const existingId = merged[placeholderIndex].id;
-      merged[placeholderIndex] = migrateProspect({...merged[placeholderIndex],...prospect,id:existingId},placeholderIndex);
-      changed = true;
-      return;
-    }
-    const exists = merged.some(row=>{
-      const sameEmail = email && String(row.email||'').trim().toLowerCase()===email;
-      const samePerson = String(row.name||'').trim().toLowerCase()===name &&
-        String(row.company||'').trim().toLowerCase()===company;
-      return sameEmail || samePerson;
-    });
-    if(exists) return;
-    merged.push(migrateProspect({...prospect,id:nextProspectId++},merged.length));
-    changed = true;
-  });
-
-  let applyFollowupUpdate = true;
-  try{applyFollowupUpdate = localStorage.getItem(LITERARY_LAB_FOLLOWUP_UPDATE_KEY)!=='1';}catch(e){}
-  if(applyFollowupUpdate){
-    literaryLabFollowupUpdates.forEach(update=>{
-      const index = merged.findIndex(row=>
-        String(row.name||'').trim().toLowerCase()===update.name.toLowerCase() &&
-        String(row.company||'').trim().toLowerCase()===update.company.toLowerCase()
-      );
-      if(index<0) return;
-      const current = merged[index];
-      const currentNotes = String(current.notes||'').trim();
-      const notes = currentNotes.includes(update.notesAppend)
-        ? currentNotes
-        : [currentNotes,update.notesAppend].filter(Boolean).join(' ');
-      merged[index] = migrateProspect({...current,...update,notes,id:current.id},index);
-      delete merged[index].notesAppend;
-      changed = true;
-    });
-    try{localStorage.setItem(LITERARY_LAB_FOLLOWUP_UPDATE_KEY,'1');}catch(e){}
-  }
-
-  if(changed) localStorage.setItem(STORAGE_KEY_V2,JSON.stringify(merged));
-  return merged;
+  return Array.isArray(existing) ? existing : [];
 }
 
 function loadData(){
@@ -2447,7 +2303,7 @@ function loadData(){
     const raw = localStorage.getItem(STORAGE_KEY_V2);
     if(raw){
       const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed)) return mergeLiteraryLabPublisherProspects(parsed.map((r,i)=>migrateProspect(r,i)));
+      if(Array.isArray(parsed)) return parsed.map((r,i)=>migrateProspect(r,i));
     }
   }catch(e){}
   // Migrate from legacy Literary Lab v2 key
@@ -2456,7 +2312,7 @@ function loadData(){
     if(raw){
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed) && parsed.length){
-        const migrated = mergeLiteraryLabPublisherProspects(parsed.map((r,i)=>migrateProspect(r,i)));
+        const migrated = parsed.map((r,i)=>migrateProspect(r,i));
         localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(migrated));
         return migrated;
       }
@@ -2468,21 +2324,20 @@ function loadData(){
     if(raw){
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed) && parsed.length){
-        const migrated = mergeLiteraryLabPublisherProspects(parsed.map((r,i)=>migrateProspect(r,i)));
+        const migrated = parsed.map((r,i)=>migrateProspect(r,i));
         localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(migrated));
         return migrated;
       }
     }
   }catch(e){}
   // Seed
-  const s = mergeLiteraryLabPublisherProspects(seedData.map((r,i)=>migrateProspect(r,i)));
+  const s = seedData.map((r,i)=>migrateProspect(r,i));
   localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(s));
   return s;
 }
 
 function saveData(d){
   localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(d));
-  if(window.__excelSyncReady) syncLinkedExcel();
 }
 
 function mergeMessageTemplateUpdate(existing){
@@ -2540,7 +2395,6 @@ function loadMessages(){
 
 function saveMessages(m){
   localStorage.setItem(MESSAGE_KEY_V2,JSON.stringify(m));
-  if(window.__excelSyncReady) syncLinkedExcel();
 }
 
 function loadActivities(){
@@ -2652,10 +2506,6 @@ let data = loadData();
 let nextId = Math.max(0,...data.map(d=>d.id||0))+1;
 let messages = loadMessages();
 let activities = loadActivities(); // {prospectId: [{type,date,note}]}
-let linkedExcelHandle = null;
-let syncTimer = null;
-window.__excelSyncReady = true;
-
 let currentFilter = 'All';
 let currentSearch = '';
 let savedViews = loadSavedViews();
@@ -3071,7 +2921,7 @@ function renderStats(){
   document.getElementById('statConvNote').textContent=contacted?Math.round(converted/contacted*100)+'% conv. rate':'—';
   document.getElementById('statFollowup').textContent=followupsNeeded;
 
-  // PIPELINE VALUE: sum dealValue for active (non-closed) prospects
+  // Revenue is won value. Open pipeline is shown beneath it.
   let pipelineTotal=0;let pipelineCount=0;
   const activeStatuses=['Contacted','Replied','Interested','Proposal Sent'];
   data.forEach(r=>{
@@ -3079,13 +2929,9 @@ function renderStats(){
     const v=moneyValue(r);
     if(v>0){pipelineTotal+=v;pipelineCount++;}
   });
-  if(pipelineCount>0){
-    document.getElementById('statPipeline').textContent=moneyFmt(pipelineTotal);
-    document.getElementById('statPipelineNote').textContent=pipelineCount+' active deal'+(pipelineCount!==1?'s':'');
-  } else {
-    document.getElementById('statPipeline').textContent='—';
-    document.getElementById('statPipelineNote').textContent='add deal values';
-  }
+  const revenueTotal=data.filter(r=>r.status==='Converted').reduce((sum,r)=>sum+moneyValue(r),0);
+  document.getElementById('statPipeline').textContent=moneyFmt(revenueTotal);
+  document.getElementById('statPipelineNote').textContent=`${moneyFmt(pipelineTotal)} open pipeline`;
 
   // Nav badge
   const badge=document.getElementById('navBadgeFollowup');
@@ -4675,179 +4521,7 @@ document.getElementById('clearAllBtn').addEventListener('click',()=>{
 });
 
 // ═══════════════════════════════════════════════
-// EXCEL EXPORT / IMPORT
-// ═══════════════════════════════════════════════
-function excelXml(){
-  const customHeaders=customFieldDefs.map(f=>'custom_'+f.key);
-  const ledgerHeaders=['id','name','linkedinUrl','jobTitle','company','industry','location','email','dateAdded','dateContacted','hook','status','interestedDate','nextFollowup','followupCount','followupSent','linkSent','leadSource','service','dealValue','tags','outcomeReason','notes',...customHeaders];
-  const messageHeaders=['id','hook','headline','note','text'];
-  const actHeaders=['prospectId','prospectName','type','date','from','to','note'];
-  const taskHeaders=['prospectId','prospectName','id','title','due','done','createdAt'];
-
-  // Flatten activities
-  const actRows=[];
-  Object.entries(activities).forEach(([pid,acts])=>{
-    const row=data.find(d=>d.id==pid);
-    (acts||[]).forEach(a=>actRows.push({
-      prospectId:pid,
-      prospectName:row?row.name:'',
-      type:a.type,
-      date:a.date,
-      from:a.from||'',
-      to:a.to||'',
-      note:a.note||''
-    }));
-  });
-  const taskRows=[];
-  data.forEach(row=>{
-    (row.tasks||[]).forEach(t=>taskRows.push({
-      prospectId:row.id,
-      prospectName:row.name,
-      id:t.id,
-      title:t.title,
-      due:t.due||'',
-      done:t.done===true,
-      createdAt:t.createdAt||''
-    }));
-  });
-  const ledgerRows=data.map(row=>{
-    const values={...row,tags:normalizeTags(row.tags).join(', ')};
-    const custom=normalizeCustomValues(row.customFields);
-    customHeaders.forEach(h=>{values[h]=custom[h.replace(/^custom_/,'')]||'';});
-    return values;
-  });
-
-  const sheet=(name,headers,rows)=>`
-    <Worksheet ss:Name="${escapeXml(name)}">
-      <Table>
-        <Row>${headers.map(h=>`<Cell><Data ss:Type="String">${escapeXml(h)}</Data></Cell>`).join('')}</Row>
-        ${rows.map(row=>`<Row>${headers.map(h=>cellXml(row[h])).join('')}</Row>`).join('')}
-      </Table>
-    </Worksheet>`;
-
-  return `<?xml version="1.0"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-  ${sheet('Ledger',ledgerHeaders,ledgerRows)}
-  ${sheet('Activities',actHeaders,actRows)}
-  ${sheet('Tasks',taskHeaders,taskRows)}
-  ${sheet('Messages',messageHeaders,messages)}
-</Workbook>`;
-}
-
-function cellXml(value){
-  const type=typeof value==='number'?'Number':'String';
-  return `<Cell><Data ss:Type="${type}">${escapeXml(value==null?'':String(value))}</Data></Cell>`;
-}
-
-document.getElementById('exportExcelBtn').addEventListener('click',()=>{
-  const blob=new Blob([excelXml()],{type:'application/vnd.ms-excel'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=`outreach-ledger-${today()}.xls`;a.click();
-  URL.revokeObjectURL(url);
-  markBackup('Exported Excel');
-});
-
-document.getElementById('linkExcelBtn').addEventListener('click',async()=>{
-  if(!window.showSaveFilePicker){alert('Live Excel linking requires Chrome or Edge. Use Export Excel instead.');return;}
-  try{
-    linkedExcelHandle=await window.showSaveFilePicker({
-      suggestedName:'outreach-ledger-live.xls',
-      types:[{description:'Excel workbook',accept:{'application/vnd.ms-excel':['.xls']}}]
-    });
-    await syncLinkedExcel();
-  }catch(e){}
-});
-
-function syncLinkedExcel(){
-  if(!linkedExcelHandle) return;
-  clearTimeout(syncTimer);
-  syncTimer=setTimeout(async()=>{
-    try{
-      const w=await linkedExcelHandle.createWritable();
-      await w.write(new Blob([excelXml()],{type:'application/vnd.ms-excel'}));
-      await w.close();
-    }catch(e){}
-  },400);
-}
-
-function rowsFromSheet(doc,sheetName){
-  const sheets=[...doc.getElementsByTagNameNS('urn:schemas-microsoft-com:office:spreadsheet','Worksheet')];
-  const sheet=sheets.find(s=>s.getAttribute('ss:Name')===sheetName||s.getAttribute('Name')===sheetName);
-  if(!sheet) return [];
-  return [...sheet.getElementsByTagNameNS('urn:schemas-microsoft-com:office:spreadsheet','Row')].map(row=>
-    [...row.getElementsByTagNameNS('urn:schemas-microsoft-com:office:spreadsheet','Data')].map(cell=>cell.textContent)
-  );
-}
-function objectsFromRows(rows){
-  if(rows.length<2) return [];
-  const headers=rows[0];
-  return rows.slice(1).map(cells=>{
-    const obj={};headers.forEach((h,i)=>obj[h]=cells[i]||'');return obj;
-  });
-}
-
-document.getElementById('importExcelFile').addEventListener('change',e=>{
-  const file=e.target.files[0];if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const text=ev.target.result;
-      const doc=new DOMParser().parseFromString(text,'text/xml');
-      if(doc.getElementsByTagName('parsererror').length) throw new Error('bad xml');
-      const imported=objectsFromRows(rowsFromSheet(doc,'Ledger'));
-      if(!imported.length) throw new Error('no data');
-      data=imported.map((r,i)=>migrateProspect(r,i)).filter(r=>r.name);
-      data.forEach((row,i)=>{
-        const source=imported[i]||{};
-        const custom={};
-        Object.entries(source).forEach(([key,value])=>{
-          if(key.startsWith('custom_')){
-            const customKey=key.replace(/^custom_/,'');
-            custom[customKey]=value;
-            if(customKey&&!customFieldDefs.some(f=>f.key===customKey)){
-              customFieldDefs.push({key:customKey,label:customKey.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())});
-            }
-          }
-        });
-        row.customFields=custom;
-      });
-      saveCustomFields(customFieldDefs);
-      const msgs=objectsFromRows(rowsFromSheet(doc,'Messages'));
-      if(msgs.length) messages=msgs.filter(m=>m.text).map(m=>({id:m.id||m.hook||String(Date.now()),hook:m.hook||'Other / custom',headline:m.headline||m.hook||'Custom',note:m.note||'',text:m.text}));
-      // Restore activities from Activities sheet
-      const actImport=objectsFromRows(rowsFromSheet(doc,'Activities'));
-      const rebuiltActs={};
-      actImport.forEach(a=>{
-        const pid=Number(a.prospectId);
-        if(!pid) return;
-        if(!rebuiltActs[pid]) rebuiltActs[pid]=[];
-        rebuiltActs[pid].push({type:a.type||'Note',date:a.date||today(),from:a.from||'',to:a.to||'',note:a.note||'',ts:Date.now()});
-      });
-      activities=rebuiltActs;
-      const taskImport=objectsFromRows(rowsFromSheet(doc,'Tasks'));
-      const tasksById={};
-      taskImport.forEach(t=>{
-        const pid=Number(t.prospectId);
-        if(!pid||!t.title) return;
-        if(!tasksById[pid]) tasksById[pid]=[];
-        tasksById[pid].push({id:t.id||('task_'+Date.now()),title:t.title,due:t.due||'',done:t.done===true||t.done==='true',createdAt:t.createdAt||new Date().toISOString()});
-      });
-      data.forEach(row=>{if(tasksById[row.id]) row.tasks=tasksById[row.id];});
-      nextId=Math.max(0,...data.map(d=>d.id||0))+1;
-      saveData(data);saveMessages(messages);saveActivities(activities);
-      audit('Imported Excel',`${data.length} prospects restored`,'Import');
-      render();alert(`Imported ${data.length} prospects from Excel.`);
-    }catch(err){alert('Could not read that file. Make sure it is an Excel backup exported from this app.');}
-  };
-  reader.readAsText(file);e.target.value='';
-});
-
-// ═══════════════════════════════════════════════
+// Excel import, export, and live linking were removed in v2.7. CSV and JSON backup remain available.
 // PERSONAL AI REPLY ASSISTANT
 // Owner-only bot for pasted LinkedIn replies.
 // It proposes changes first; dashboard edits happen only after approval.
@@ -5790,7 +5464,7 @@ document.getElementById('importCsvFile').addEventListener('change',e=>{
       if(lines.length<2) throw new Error('CSV appears empty.');
       pendingCsvSource={lines,headers:lines[0],mapping:autoCsvMapping(lines[0])};
       showCsvPreview(buildCsvImportRowsFromParsed(lines,pendingCsvSource.mapping));
-    }catch(err){console.error(err);alert(err.message||'Could not read CSV. Check the format and try again.');}
+    }catch(err){alert(err.message||'Could not read CSV. Check the format and try again.');}
   };
   reader.readAsText(file);
   e.target.value='';
@@ -5822,217 +5496,7 @@ document.getElementById('csvPreviewImport').addEventListener('click',()=>{
 
 
 // ═══════════════════════════════════════════════
-// LICENSE ACTIVATION
-// ═══════════════════════════════════════════════
-function deviceFingerprint(){
-  const raw=[
-    screen.width,screen.height,
-    navigator.language||'',
-    Intl.DateTimeFormat().resolvedOptions().timeZone||'',
-    navigator.platform||''
-  ].join('|');
-  let h=0;
-  for(let i=0;i<raw.length;i++){h=((h<<5)-h)+raw.charCodeAt(i);h|=0;}
-  return Math.abs(h).toString(36);
-}
-
-function openActivationDB(){
-  return new Promise(resolve=>{
-    if(!('indexedDB' in window)) return resolve(null);
-    const req=indexedDB.open(ACTIVATION_DB,1);
-    req.onupgradeneeded=()=>{try{req.result.createObjectStore(ACTIVATION_STORE,{keyPath:'id'});}catch(e){}};
-    req.onsuccess=()=>resolve(req.result);
-    req.onerror=()=>resolve(null);
-    req.onblocked=()=>resolve(null);
-  });
-}
-
-async function saveActivationIndexedDB(record){
-  const db=await openActivationDB();
-  if(!db) return;
-  await new Promise(resolve=>{
-    try{
-      const tx=db.transaction(ACTIVATION_STORE,'readwrite');
-      tx.objectStore(ACTIVATION_STORE).put({...record,id:'current'});
-      tx.oncomplete=()=>resolve();
-      tx.onerror=()=>resolve();
-    }catch(e){resolve();}
-  });
-  try{db.close();}catch(e){}
-}
-
-async function readActivationIndexedDB(){
-  const db=await openActivationDB();
-  if(!db) return null;
-  const record=await new Promise(resolve=>{
-    try{
-      const tx=db.transaction(ACTIVATION_STORE,'readonly');
-      const req=tx.objectStore(ACTIVATION_STORE).get('current');
-      req.onsuccess=()=>resolve(req.result||null);
-      req.onerror=()=>resolve(null);
-    }catch(e){resolve(null);}
-  });
-  try{db.close();}catch(e){}
-  if(record){delete record.id;}
-  return record;
-}
-
-async function clearActivationIndexedDB(){
-  const db=await openActivationDB();
-  if(!db) return;
-  await new Promise(resolve=>{
-    try{
-      const tx=db.transaction(ACTIVATION_STORE,'readwrite');
-      tx.objectStore(ACTIVATION_STORE).delete('current');
-      tx.oncomplete=()=>resolve();
-      tx.onerror=()=>resolve();
-    }catch(e){resolve();}
-  });
-  try{db.close();}catch(e){}
-}
-
-function activationCookie(){
-  try{
-    const found=document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith(ACTIVATION_COOKIE+'='));
-    if(!found) return null;
-    return decodeURIComponent(found.slice(ACTIVATION_COOKIE.length+1));
-  }catch(e){return null;}
-}
-
-async function saveActivationRecord(record){
-  const raw=JSON.stringify(record);
-  try{localStorage.setItem(ACTIVATION_KEY,raw);}catch(e){}
-  try{sessionStorage.setItem(ACTIVATION_KEY,raw);}catch(e){}
-  try{document.cookie=ACTIVATION_COOKIE+'='+encodeURIComponent(raw)+'; max-age=31536000; path=/; SameSite=Lax';}catch(e){}
-  await saveActivationIndexedDB(record);
-}
-
-async function readActivationRecord(){
-  let raw=null;
-  try{raw=localStorage.getItem(ACTIVATION_KEY);}catch(e){}
-  if(raw) return raw;
-  try{raw=sessionStorage.getItem(ACTIVATION_KEY);}catch(e){}
-  if(raw){try{localStorage.setItem(ACTIVATION_KEY,raw);}catch(e){};return raw;}
-  raw=activationCookie();
-  if(raw){try{localStorage.setItem(ACTIVATION_KEY,raw);}catch(e){};return raw;}
-  const dbRecord=await readActivationIndexedDB();
-  if(dbRecord&&dbRecord.key&&dbRecord.device){
-    raw=JSON.stringify(dbRecord);
-    try{localStorage.setItem(ACTIVATION_KEY,raw);}catch(e){}
-    return raw;
-  }
-  return null;
-}
-
-function clearActivationRecord(){
-  try{localStorage.removeItem(ACTIVATION_KEY);}catch(e){}
-  try{sessionStorage.removeItem(ACTIVATION_KEY);}catch(e){}
-  try{document.cookie=ACTIVATION_COOKIE+'=; max-age=0; path=/; SameSite=Lax';}catch(e){}
-  clearActivationIndexedDB();
-}
-
-async function doActivate(){
-  const inp=document.getElementById('actKeyInput');
-  const msg=document.getElementById('actMsg');
-  const btn=document.getElementById('actSubmit');
-  const key=(inp.value||'').trim().toUpperCase();
-
-  if(!key){inp.classList.add('act-err');msg.className='act-msg err';msg.textContent='Please enter your license key.';return;}
-  inp.classList.remove('act-err');
-
-  // Basic format check
-  const parts=key.split('-');
-  if(parts.length<3){inp.classList.add('act-err');msg.className='act-msg err';msg.textContent='Invalid key format. Example: OC-ABCD-EFGH-JKLM-MNOP';return;}
-
-  btn.disabled=true;
-  msg.className='act-msg info';msg.textContent='Checking your license key…';
-
-  const device=deviceFingerprint();
-
-  try{
-    const res=await fetch(WORKER_URL+'/activate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({key,device}),
-      signal:AbortSignal.timeout(12000)
-    });
-    if(!res.ok) throw new Error('Server error '+res.status);
-    const data=await res.json();
-
-    if(data.success){
-      msg.className='act-msg ok';msg.textContent='✓ Activated! Loading your dashboard…';
-      await saveActivationRecord({key,device,ts:Date.now()});
-      setTimeout(()=>{
-        document.getElementById('actOverlay').style.display='none';
-        // Show onboarding if first time
-        if(!localStorage.getItem(ONBOARDED_KEY)){
-          document.getElementById('onboardOverlay').style.display='flex';
-        }
-      },900);
-    } else {
-      inp.classList.add('act-err');
-      btn.disabled=false;
-      if(data.error==='max_activations'){
-        msg.className='act-msg err';msg.textContent=data.message||'Maximum activations reached for this key. Contact the seller.';
-      } else {
-        msg.className='act-msg err';msg.textContent=data.message||'Invalid license key. Check for typos or contact the seller.';
-      }
-    }
-  }catch(e){
-    btn.disabled=false;
-    msg.className='act-msg err';
-    msg.textContent='Could not reach the activation server. Check your internet connection and try again.';
-  }
-}
-
-// Allow Enter key in license field
-document.getElementById('actKeyInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter') doActivate();
-  document.getElementById('actKeyInput').classList.remove('act-err');
-  document.getElementById('actMsg').textContent='';
-});
-
-function lockForActivation(message){
-  clearActivationRecord();
-  const overlay=document.getElementById('actOverlay');
-  if(overlay) overlay.style.display='flex';
-  const onb=document.getElementById('onboardOverlay');
-  if(onb) onb.style.display='none';
-  const btn=document.getElementById('actSubmit');
-  if(btn) btn.disabled=false;
-  const msg=document.getElementById('actMsg');
-  if(msg&&message){msg.className='act-msg err';msg.textContent=message;}
-}
-
-async function validateStoredActivation(stored){
-  let saved;
-  try{saved=JSON.parse(stored);}catch(e){return {success:false,message:'Please activate this copy again.'};}
-  if(!saved||!saved.key||!saved.device) return {success:false,message:'Please activate this copy again.'};
-  try{
-    const res=await fetch(WORKER_URL+'/validate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({key:saved.key,device:saved.device}),
-      signal:AbortSignal.timeout(12000)
-    });
-    if(!res.ok) throw new Error('Server error '+res.status);
-    return await res.json();
-  }catch(e){
-    return {success:true,offline:true,message:'License server could not be reached. Using saved activation.'};
-  }
-}
-
-(async function initActivation(){
-  // Personal owner copy only: skip license gate.
-  // Release/customer files still use Cloudflare license validation.
-  try{
-    saveActivationRecord({key:'OWNER-PERSONAL-COPY',device:'owner',ts:Date.now(),personal:true});
-  }catch(e){}
-  const overlay=document.getElementById('actOverlay');
-  if(overlay) overlay.style.display='none';
-})();
-
-// ═══════════════════════════════════════════════
+// License activation code removed. Outreach Command v2.7 works locally without an account.
 // ONBOARDING
 // ═══════════════════════════════════════════════
 (function initOnboarding(){
@@ -6046,7 +5510,7 @@ async function validateStoredActivation(stored){
     document.getElementById('onboardOverlay').style.display='none';
   });
   document.getElementById('onboardClear').addEventListener('click',()=>{
-    if(!confirm('This will clear the 6 sample prospects. Your app starts completely empty. Continue?'))return;
+    if(!confirm('This will clear the sample prospects. Your app starts completely empty. Continue?'))return;
     data=[];activities={};nextId=1;
     saveData(data);saveActivities(activities);
     try{localStorage.setItem(ONBOARDED_KEY,'1');}catch(e){}
@@ -6247,10 +5711,16 @@ input.tag-color-input{width:30px;height:20px;padding:0;border:none;background:no
     </div>
   </div>
   <div class="gmail-box">
-    <div class="gmail-box-title">Connect Your Gmail — Free Setup (~3 min)</div>
-    <div class="gmail-box-sub">Uses Google Apps Script: runs in your own Google account, reads your Gmail directly. No third party ever sees your emails.</div>
-    <div class="gmail-step"><div class="gmail-step-num">1</div><div class="gmail-step-body">Go to <strong>script.google.com</strong> → New Project → paste the script below → Deploy → New Deployment → Web App → "Execute as: Me" → "Who has access: Only myself" → Deploy → copy the URL.</div></div>
-    <pre class="gmail-code" id="gmailScriptCode">function doGet(e) {
+    <div class="gmail-box-title">Optional Gmail Sync</div>
+    <div class="gmail-box-sub">This uses your own Google Apps Script. It only reads Gmail when you choose Sync Now.</div>
+    <div class="gmail-step"><div class="gmail-step-num">1</div><div class="gmail-step-body">Open <strong>script.google.com</strong>, choose <strong>New project</strong>, delete the starter code, and paste this script.</div></div>
+    <pre class="gmail-code" id="gmailScriptCode">var SECRET_TOKEN = 'replace-this-with-a-long-private-token';
+
+function doGet(e) {
+  if (!e.parameter.token || e.parameter.token !== SECRET_TOKEN) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: 'Unauthorized' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   var emails = JSON.parse(e.parameter.emails || '[]');
   var days   = parseInt(e.parameter.days   || '30');
   var cutoff = new Date();
@@ -6284,9 +5754,11 @@ input.tag-color-input{width:30px;height:20px;padding:0;border:none;background:no
     .setMimeType(ContentService.MimeType.JSON);
 }</pre>
     <button class="btn btn-sm" id="copyGmailScriptBtn" style="margin-bottom:14px;">Copy Script</button>
-    <div class="gmail-step"><div class="gmail-step-num">2</div><div class="gmail-step-body">Paste your deployed web app URL here and click Save.</div></div>
+    <div class="gmail-step"><div class="gmail-step-num">2</div><div class="gmail-step-body">Choose <strong>Deploy</strong>, then <strong>New deployment</strong>. Select <strong>Web app</strong>, set <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>, then deploy and copy the web app URL.</div></div>
+    <div class="gmail-step"><div class="gmail-step-num">3</div><div class="gmail-step-body">Create a long private token, put the same token in the script and below, then save. Keep it private.</div></div>
     <div style="display:flex;gap:8px;margin-top:8px;">
       <input class="form-input" type="url" id="gmailScriptUrl" placeholder="https://script.google.com/macros/s/…/exec" style="flex:1;">
+      <input class="form-input" type="password" id="gmailSecretToken" placeholder="Private token" style="flex:1;">
       <button class="btn btn-primary" id="gmailSaveUrlBtn">Save URL</button>
     </div>
     <div id="gmailUrlStatus" style="font-size:12px;color:var(--green);margin-top:6px;min-height:16px;"></div>
@@ -6347,6 +5819,7 @@ const TAG_COLORS_KEY = 'oc_tag_colors_v1';
 const THEME_KEY      = 'oc_theme_v1';
 const INTENTION_KEY  = 'oc_today_intention_v1';
 const GMAIL_URL_KEY  = 'oc_gmail_script_url_v1';
+const GMAIL_TOKEN_KEY = 'oc_gmail_secret_token_v1';
 const AB_KEY         = 'oc_ab_data_v1';
 
 function lsGet(key,def){
@@ -6924,9 +6397,7 @@ function injectTemplatePreview(){
     });
   }
   const due=data.filter(r=>needsFollowup(r)).length;
-  if(due>0&&Notification.permission==='default'){
-    setTimeout(()=>Notification.requestPermission().then(p=>{if(p==='granted')fireNotif();}),4000);
-  } else { fireNotif(); }
+  if(Notification.permission==='granted') fireNotif();
 
   // Settings toggle
   const pg=document.getElementById('page-settings');if(!pg) return;
@@ -7004,19 +6475,24 @@ function injectTemplatePreview(){
 // GMAIL SYNC
 // ══════════════════════════════
 let gmailScriptUrl=lsGet(GMAIL_URL_KEY,'');
+let gmailSecretToken=lsGet(GMAIL_TOKEN_KEY,'');
 let gmailPending=[];
 
 function renderGmailPage(){
   const inp=document.getElementById('gmailScriptUrl');
   if(inp) inp.value=gmailScriptUrl||'';
+  const token=document.getElementById('gmailSecretToken');
+  if(token) token.value=gmailSecretToken||'';
   const syncBox=document.getElementById('gmailSyncBox');
   if(syncBox) syncBox.style.display=gmailScriptUrl?'':'none';
 }
 
 document.getElementById('gmailSaveUrlBtn')?.addEventListener('click',()=>{
   const v=(document.getElementById('gmailScriptUrl')?.value||'').trim();
+  const token=(document.getElementById('gmailSecretToken')?.value||'').trim();
   if(!v||!v.startsWith('https://')){alert('Enter a valid https:// URL.');return;}
-  gmailScriptUrl=v;lsSet(GMAIL_URL_KEY,v);
+  if(!token){alert('Enter your private Gmail sync token.');return;}
+  gmailScriptUrl=v;gmailSecretToken=token;lsSet(GMAIL_URL_KEY,v);lsSet(GMAIL_TOKEN_KEY,token);
   document.getElementById('gmailUrlStatus').textContent='✓ URL saved. Click Sync Now.';
   document.getElementById('gmailSyncBox').style.display='';
 });
@@ -7032,7 +6508,7 @@ document.getElementById('copyGmailScriptBtn')?.addEventListener('click',()=>{
 document.getElementById('gmailSyncBtn')?.addEventListener('click',syncGmail);
 
 async function syncGmail(){
-  if(!gmailScriptUrl){alert('Save your Apps Script URL first.');v27ShowPage('gmail');return;}
+  if(!gmailScriptUrl||!gmailSecretToken){alert('Save your Apps Script URL and private token first.');v27ShowPage('gmail');return;}
   const withEmails=data.filter(r=>r.email&&r.email.trim()&&!['Converted','Not Interested'].includes(r.status));
   if(!withEmails.length){
     document.getElementById('gmailSyncStatus').textContent='No prospects with email addresses. Add emails to your prospects first.';
@@ -7045,7 +6521,7 @@ async function syncGmail(){
   if(statusEl) statusEl.textContent=`Checking ${withEmails.length} prospects…`;
   try{
     const emails=withEmails.map(r=>r.email.trim().toLowerCase());
-    const url=gmailScriptUrl+'?emails='+encodeURIComponent(JSON.stringify(emails))+'&days='+days;
+    const url=gmailScriptUrl+'?emails='+encodeURIComponent(JSON.stringify(emails))+'&days='+days+'&token='+encodeURIComponent(gmailSecretToken);
     const res=await fetch(url,{signal:AbortSignal.timeout(30000)});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const json=await res.json();
@@ -7169,7 +6645,6 @@ setTimeout(()=>{
   }
 },150);
 
-console.log('Outreach Command v2.7 — Feature Pack loaded ✓');
 </script>
 <script>
 // ═══════════════════════════════════════════════
@@ -8131,7 +7606,6 @@ Return JSON only:
   }
 
   setTimeout(initGmailAiAssistant, 300);
-  console.log('Gmail + Gemini Assistant Upgrade loaded ✓');
 })();
 </script>
 <style>
@@ -8195,10 +7669,8 @@ Return JSON only:
     button.addEventListener('click',openWorkspaceHub);
     commandTools.appendChild(button);
   }
-  console.log('Client Workspace integrations loaded ✓');
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="cloud-sync.js?v=20261001"></script>
+<script src="v27-cleanup.js?v=20261007"></script>
 </body>
 </html>

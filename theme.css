@@ -34,19 +34,14 @@ button { border-color: #314966; }
 .workspace-action span { color: #46b8a6; font-size: 18px; }
 .workspace-action strong { font-size: 13px; }
 .workspace-action small { color: #9badbf; font-size: 11px; line-height: 1.35; }
-.cloud-sync-button { border-color: #647fd8; background: #172346; color: #e9edff; }
-.cloud-sync-button:hover { background:#253767; }
-.cloud-sync-modal { max-width: 540px !important; }
-.cloud-sync-copy { color:#b8c7d8; line-height:1.55; margin: 0 0 18px; }
-.cloud-sync-actions { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 12px; }
-.cloud-sync-message { min-height:20px; color:#82dbc9; font-size:12px; line-height:1.4; }
-.cloud-sync-message.is-error { color:#ff9d9d; }
-.cloud-account { display:flex; align-items:center; gap:10px; padding:12px; background:#0b1726; border:1px solid #314966; border-radius:9px; margin-bottom:16px; }
-.cloud-account strong,.cloud-account small { display:block; }
-.cloud-account small { color:#9badbf; font-size:11px; margin-top:2px; }
-.cloud-account-dot { width:9px; height:9px; border-radius:50%; background:#46b8a6; box-shadow:0 0 0 4px rgba(70,184,166,.12); }
-.cloud-signout { appearance:none; border:0; background:transparent; color:#9badbf; padding:4px 0; font-size:12px; cursor:pointer; }
-.cloud-signout:hover { color:#fff; }
+.footer-link{border:0;background:transparent;color:var(--coral);cursor:pointer;padding:0;font:inherit;}
+.nav-icon svg,.tool-dot svg{display:block;margin:auto;}
+.gmail-modal-page.active{display:flex!important;position:fixed;inset:0;z-index:2200;padding:16px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);align-items:center;justify-content:center;overflow:auto;}
+.gmail-modal-page .gmail-modal{width:min(760px,100%);max-height:90vh;overflow-y:auto;}
+.gmail-modal-page .gmail-modal .page-header{display:none;}
+.gmail-modal-page .gmail-modal .gmail-box{margin:0 0 14px;}
+.backup-reminder{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 24px 16px;padding:10px 12px;border:1px solid #876b28;background:#2a2212;color:#f4d88b;border-radius:8px;font-size:12px;}
+@media(max-width:640px){.backup-reminder{margin:0 12px 12px;align-items:flex-start;flex-direction:column;}.gmail-modal-page.active{padding:12px;}}
 @media (max-width: 640px) { .workspace-actions { grid-template-columns: 1fr; } .top-workspace-button { padding: 7px 9px; } }
 
 /* The document previews stay white intentionally; the editor chrome matches Outreach Command. */
